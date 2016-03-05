@@ -21,3 +21,6 @@ git pull && git submodule update --init --recursive
 cd /home/craig/git_repos/dotfiles
 cp .gitconfig ~/
 cp .zpreztorc ~/
+#copy sound edirol scripts
+sudo cp .enable_edirol /usr/local/bin/.enable_edirol
+sudo cp .disable_edirol/usr/local/bin/.disable_edirol
