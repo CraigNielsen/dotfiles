@@ -1,24 +1,25 @@
+
+[core]
+	editor = vim
+[user]
+	name = Craig Nielsen
+	email = craiglbn@gmail.com
 [merge]
 	    keepBackup = false;
-		    tool = p4merge
+	    tool = p4merge
 [mergetool]
 	    prompt = false
 [mergetool "p4merge"]
 	    cmd = p4merge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"
-		    keepTemporaries = false
-			    trustExitCode = false
-				    keepBackup = false
+	    keepTemporaries = false
+	    trustExitCode = false
+	    keepBackup = false
 [diff]
 	    tool = p4merge
 [difftool]
 	    prompt = false
 [difftool "p4merge"]
 	    cmd = p4merge "$LOCAL" "$REMOTE"
-		    keepTemporaries = false
-			    trustExitCode = false
-				    keepBackup = false
-[core]
-	editor = vim
-[user]
-	name = Craig Nielsen
-	email = craiglbn@gmail.com
+	    keepTemporaries = false
+	    trustExitCode = false
+	    keepBackup = falsedefault = matching
