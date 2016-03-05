@@ -15,6 +15,8 @@ do
 	  ln -s "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"
   done
 chsh -s /bin/zsh
+cd /home/craig/.zpreto
+git pull && git submodule update --init --recursive
 #copy scripts to home
 cd /home/craig/git_repos/dotfiles
 cp .gitconfig ~/
