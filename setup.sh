@@ -16,5 +16,6 @@ do
   done
 chsh -s /bin/zsh
 #copy scripts to home
+cd /home/craig/git_repos/dotfiles
 cp .gitconfig ~/
 cp .zpreztorc ~/
