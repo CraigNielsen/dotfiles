@@ -1,0 +1,3 @@
+#!/bin/zsh
+cd /etc
+sudo sed -i -- 's/1/2/g' asound.conf
