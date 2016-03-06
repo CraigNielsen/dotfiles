@@ -23,3 +23,5 @@
 	    keepTemporaries = false
 	    trustExitCode = false
 	    keepBackup = falsedefault = matching
+[push]
+	default = matching
