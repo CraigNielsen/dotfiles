@@ -21,8 +21,7 @@ font pango:monospace 8
 
 # Before i3 v4.8, we used to recommend this one as the default:
 # font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
-# The font above is very space-efficient, that is, it looks good, sharp and
-# clear in small sizes. However, its unicode glyph coverage is limited, the old
+# The font above is very space-efficient, that is, it looks good, sharp and # clear in small sizes. However, its unicode glyph coverage is limited, the old
 # X core fonts rendering does not support right-to-left and this being a bitmap
 # font, it doesn’t scale on retina/hidpi displays.
 
@@ -165,7 +164,10 @@ bindsym $mod+F9 exec amixer -q set Master toggle
 bindsym $mod+F10 exec amixer -q set Master 7%- unmute
 bindsym $mod+F11 exec amixer -q set Master 7%+ unmute
 bindsym $mod+F6 exec .screenlayout/screen_setup.sh
-bindsym $mod+n exec nautilus
+bindsym $mod+F7 exec .screenlayout/port.sh
+bindsym $mod+F8 exec .screenlayout/home.sh
+bindsym $mod+n exec thunar
+bindsym $mod+i exec /opt/idea/bin/idea.sh
 
 bindsym XF86AudioLowerVolume exec amixer -q set Master 7%- unmute
 bindsym XF86AudioRaiseVolume exec amixer -q set Master 7%+ unmute

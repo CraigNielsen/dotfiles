@@ -24,4 +24,4 @@
 	    trustExitCode = false
 	    keepBackup = falsedefault = matching
 [push]
-	default = matching
+	default = simple
