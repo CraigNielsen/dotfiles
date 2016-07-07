@@ -3,3 +3,4 @@
 /home/craig/.gitconfig
 /home/craig/.Xmodmap
 /home/craig/.atom/snippets.cson
+/home/craig/.atom/keymap.cson
