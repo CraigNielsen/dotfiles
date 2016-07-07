@@ -1,0 +1,5 @@
+/home/craig/.i3/config
+/home/craig/.zpreztorc
+/home/craig/.gitconfig
+/home/craig/.Xmodmap
+/home/craig/.atom/snippets.cson
