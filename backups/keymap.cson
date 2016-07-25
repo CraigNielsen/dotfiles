@@ -1,0 +1,7 @@
+'body':
+  'ctrl-tab': 'pane:show-next-item'
+  'ctrl-tab ^ctrl': 'unset!'
+  'ctrl-shift-tab': 'pane:show-previous-item'
+  'ctrl-shift-tab ^ctrl': 'unset!'
+  'alt-k': 'last-cursor-position:next'
+  'alt-j': 'last-cursor-position:previous'

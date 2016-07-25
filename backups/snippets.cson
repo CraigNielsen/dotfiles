@@ -31,7 +31,9 @@
     'body': """
       constructor(props) {
         super(props);
-        ${1}
+        this.state = {
+          ${1}
+        }
       }
     """
   'React Dumb Component':
@@ -46,7 +48,7 @@
       )
       ${1}.propTypes = {
         ${2}: PropTypes.
-      };
+      }
     """
   'React ES6 Functional Component':
     'prefix': 'rfunc'
@@ -189,4 +191,25 @@
       <${1}>
         ${2}
       </${1}>
+    """
+  'javascript loggin':
+    'prefix': 'conlog',
+    'body': """
+    console.log('${1}: ', ${2})
+    """
+  'javascript map':
+    'prefix': 'map',
+    'body': """
+    ${1}.map((${2}) => (
+        ${3}
+    ))
+    """
+  'javascript map2':
+    'prefix': 'map2',
+    'body': """
+    ${1}.map((${2}) => {
+      return (
+        ${3}
+      )
+    })
     """
