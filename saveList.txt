@@ -2,3 +2,8 @@
 /home/craig/.zprezto/runcoms/zpreztorc
 /home/craig/.gitconfig
 /home/craig/.Xmodmap
+/etc/apt/sources.list.d/postgres.list
+/etc/apt/sources.list.d/atom.list
+/etc/apt/sources.list.d/docker.list
+/etc/apt/sources.list.d/heroku.list
+/etc/apt/sources.list.d/nodesource.list
