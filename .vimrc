@@ -35,14 +35,14 @@ Plugin 'honza/vim-snippets'
 call vundle#end()            " required
 " ____________________________+++++++++++++++++++++++
 
-let g:UltiSnipsExpandTrigger="<ENTER>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
-set rtp+=~/UltiSnips
+let g:UltiSnipsExpandTrigger="<ENTER>"
+let g:UltiSnipsJumpForwardTrigger="<c-y>"
+let g:UltiSnipsJumpBackwardTrigger="<c-m>"
+
 let g:UltiSnipsEditSplit="vertical"
-let g:UltiSnipsSnippetsDir="~/UltiSnips"
-let g:UltiSnipsSnippetDirectories=["UltiSnips"]
+let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips', 'UltiSnips']
+" let g:UltiSnipsSnippetDirectories=["UltiSnips"]
 " Enable filetype plugins
 "
 set history=700
