@@ -10,9 +10,13 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'altercation/vim-colors-solarized'
+Plugin 'ervandew/supertab'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'scrooloose/nerdtree'
+Plugin 'ternjs/tern_for_vim'
 
 " The following are examples of different formats supported.
 " Keep Plugin commands between vundle#begin/end.
@@ -33,22 +37,44 @@ Plugin 'honza/vim-snippets'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
-" ____________________________+++++++++++++++++++++++
+" _____________++++++++++++++++++++++++++++++++++++++++
 
+" using supertab config
+let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+let g:SuperTabDefaultCompletionType = '<C-n>'
 
-let g:UltiSnipsExpandTrigger="<ENTER>"
-let g:UltiSnipsJumpForwardTrigger="<c-y>"
-let g:UltiSnipsJumpBackwardTrigger="<c-m>"
+let g:UltiSnipsExpandTrigger = "<tab>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+" _____________++++++++++++++++++++++++++++++++++++++++
+" using older config
 
-let g:UltiSnipsEditSplit="vertical"
-let g:UltiSnipsSnippetDirectories=[$HOME.'/.vim/UltiSnips', 'UltiSnips']
+" let g:UltiSnipsExpandTrigger="<C-n>"
+" let g:UltiSnipsJumpForwardTrigger="<c-y>"
+" let g:UltiSnipsJumpBackwardTrigger="<c-m>"
+" 
+" let g:UltiSnipsEditSplit="vertical"
+" let g:UltiSnipsSnippetDirectories=['/home/craig/.vim/UltiSnips', 'UltiSnips']
+" let g:UltiSnipsSnippetsDir="~/.vim/UltiSnips"
 " let g:UltiSnipsSnippetDirectories=["UltiSnips"]
+" _____________++++++++++++++++++++++++++++++++++++++++
 " Enable filetype plugins
 "
+" _____________++++++++++++++++++++++++++++++++++++++++
+" cntrl p config
+let g:ctrlp_max_files=10000
+" let g:ctrlp_custom_ignore='node_modules\|DS_Store\|git'
+set wildignore+=*/.git/*,*/node_modules
+" _____________++++++++++++++++++++++++++++++++++++++++
+" ternjs config
+let g:tern_map_keys=1
+" _____________++++++++++++++++++++++++++++++++++++++++
 set history=700
 filetype plugin indent on    " required
 "Always show current position
 set ruler
+nnoremap <F5> :NERDTreeToggle<CR>
 
 " Height of the command bar
 set cmdheight=2
