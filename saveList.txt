@@ -1,13 +1,8 @@
 /home/craig/.i3/config
-/home/craig/.zprezto/runcoms/zpreztorc
-/home/craig/.gitconfig
 /home/craig/.Xmodmap
-<<<<<<< HEAD
-/home/craig/.xsessionrc
-=======
-/etc/apt/sources.list.d/postgres.list
-/etc/apt/sources.list.d/atom.list
-/etc/apt/sources.list.d/docker.list
-/etc/apt/sources.list.d/heroku.list
-/etc/apt/sources.list.d/nodesource.list
->>>>>>> f0244b023514f32f51bc9f2eebc59a47597bdb74
+/home/craig/.config/nvim/init.vim
+/home/craig/.config/nvim/config/airline.vimrc
+/home/craig/.config/nvim/config/general.vimrc
+/home/craig/.config/nvim/config/keys.vimrc
+/home/craig/.config/nvim/config/plugins.vimrc
+/home/craig/.config/nvim/config/plug.vimrc
