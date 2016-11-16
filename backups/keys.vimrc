@@ -22,6 +22,20 @@ nnoremap <Leader>bd :bd!<CR>
 " new buffer/tab
 nnoremap <Leader>e :enew<CR>
 
+" Looper buffers
+"let g:buffergator_mru_cycle_loop = 1
+" Go to the previous buffer open
+nnoremap <leader>jj :BuffergatorMruCyclePrev<cr>
+" Go to the next buffer open
+nnoremap <leader>kk :BuffergatorMruCycleNext<cr>
+" View the entire list of buffers open
+nnoremap <leader>bl :BuffergatorOpen<cr>
+" To open a new empty buffer
+nnoremap <leader>T :enew<cr>
+" Close the current buffer and move to the previous one
+" This replicates the idea of closing a tab
+nnoremap <leader>bq :bp <BAR> bd #<cr>
+
 " window keys
 nnoremap <Leader>w< <C-w><
 nnoremap <Leader>w> <C-w>>

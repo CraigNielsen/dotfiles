@@ -24,6 +24,7 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'vim-utils/vim-husk'
 
 " editing
+Plug 'jeetsukumaran/vim-buffergator'
 Plug 'wikitopian/hardmode'
 Plug 'easymotion/vim-easymotion'
 Plug 'junegunn/vim-easy-align'

@@ -5,13 +5,17 @@ let g:python_host_prog = '/home/craig/.pyenv/versions/neovim2/bin/python'
 " neomake config
 autocmd! BufWritePost * Neomake
 " autocmd BufLeave * QFix
-
 "let g:neomake_place_signs = 0
-
 "let g:neomake_open_list = 2
 "emmet irritation
 let g:user_emmet_leader_key='<C-Z>'
 "let g:neomake_javascript_enabled_makers = ['eslint']
+
+" buffergator
+" Use the right side of the screen
+let g:buffergator_viewport_split_policy = 'R'
+" I want my own keymappings...
+let g:buffergator_suppress_keymaps = 1
 
 set termguicolors
 set background=dark
