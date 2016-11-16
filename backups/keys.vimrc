@@ -7,6 +7,7 @@ nnoremap <Leader>; ,
 nmap <Leader>j gj
 nmap <Leader>k gk
 
+
 " hard mode config
 nnoremap <Leader>h <Esc>:call ToggleHardMode()<CR>
 
@@ -43,8 +44,8 @@ nnoremap <Leader>pb :CtrlPBuffer<CR>
 " Function keys
 nnoremap <silent> <F2> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
 nnoremap <F3> :set hlsearch!<CR>
-nnoremap <F5> :source $HOME/.config/nvim/init.vim<CR>
-nnoremap <F6> :NERDTreeToggle<CR>
+nnoremap <F6> :source $HOME/.config/nvim/init.vim<CR>
+nnoremap <F5> :NERDTreeToggle<CR>
 nnoremap <F7> :UndotreeToggle<CR>
 nnoremap <F8> :Geeknote<CR>
 " indent whole file according to syntax rules
@@ -54,16 +55,17 @@ noremap <F9> gg=G
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
 " Don't use Ex mode, use Q for formatting
-map Q gq
+" map Q gq
 
 " relative line numbers
 nnoremap <Leader>3 :NumbersToggle<CR>
 
 " remap number increment to C-s (C-a is already in use by tmux)
-nmap <C-s> <C-a>
+" nnoremap <C-s> <C-a>
 
 " Word count selection
 vnoremap <Leader>w :w !wc -w<CR>
+
 
 " vim paste mode toggle (for fixing indentation issues when pasting text)
 nnoremap <F2> :set invpaste paste?<CR>
@@ -71,7 +73,7 @@ set pastetoggle=<F2>
 set showmode
 
 " override read-only permissions
-cmap w!! %!sudo tee > /dev/null %
+" cmap w!! %!sudo tee > /dev/null %
 
 " allow ,, for vimsneak
 nmap <Leader>, <Plug>SneakPrevious
@@ -118,11 +120,11 @@ let g:UltiSnipsJumpForwardTrigger = "<C-y>"
 let g:UltiSnipsJumpBackwardTrigger = "<C-b>"
 
 " neomake
-nmap <Leader><Space>o :lopen<CR>
-nmap <Leader><Space>c :lclose<CR>
-nmap <Leader><Space>, :ll<CR>
-nmap <Leader><Space>n :lnext<CR>
-nmap <Leader><Space>p :lprev<CR>
+"nmap <Leader><Space>o :lopen<CR>
+"nmap <Leader><Space>c :lclose<CR>
+"nmap <Leader><Space>, :ll<CR>
+"nmap <Leader><Space>n :lnext<CR>
+"nmap <Leader><Space>p :lprev<CR>
 
 " folding
 nmap <Leader><F2> zf%
@@ -131,10 +133,10 @@ nmap <Leader><F2> zf%
 autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
 
 " autocomplete
-let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
-let g:UltiSnipsExpandTrigger="<C-j>"
+" let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
+" let g:UltiSnipsExpandTrigger="<C-j>"
 " inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<C-R>=UltiSnips#ExpandSnippet()"
+" inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<C-R>=UltiSnips#ExpandSnippet()"
 
 " colorizer
 nmap <Leader>tc :ColorToggle<CR>
