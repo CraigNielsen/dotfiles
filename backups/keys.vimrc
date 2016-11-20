@@ -61,6 +61,7 @@ nnoremap <Leader>pf :CtrlP<CR>
 nnoremap <Leader>pm :CtrlPMRUFiles<CR>
 nnoremap <Leader>pr :CtrlPMRUFiles<CR>
 nnoremap <Leader>pb :CtrlPBuffer<CR>
+nnoremap <Leader>pb :CtrlPBuffer<CR>
 
 " Function keys
 nnoremap <silent> <F2> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
@@ -140,6 +141,8 @@ let g:UltiSnipsExpandTrigger = "<C-y>"
 let g:UltiSnipsJumpForwardTrigger = "<C-y>"
 let g:UltiSnipsJumpBackwardTrigger = "<C-b>"
 nnoremap <Leader>g :YcmCompleter GoToDefinition<CR>
+nmap <Leader>tg yiw:CtrlP<CR><C-\>w
+nmap <Leader>tt /<C-R>"<CR>
 " neomake
 "nmap <Leader><Space>o :lopen<CR>
 "nmap <Leader><Space>c :lclose<CR>
