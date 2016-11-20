@@ -11,6 +11,8 @@ autocmd! BufWritePost * Neomake
 let g:user_emmet_leader_key='<C-Z>'
 "let g:neomake_javascript_enabled_makers = ['eslint']
 
+" silver searcher
+let g:ackprg = 'ag --nogroup --nocolor --column'
 " buffergator
 " Use the right side of the screen
 let g:buffergator_viewport_split_policy = 'R'
@@ -35,7 +37,7 @@ let g:ctrlp_prompt_mappings={'PrtdeleteEnt()':['<Leader><F7>']}
 let g:ctrlp_match_window='bottom,order:btt,min:2,max:25'
 set wildmenu " enhanced autocomplete
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot
-",*public/css/*,*public/js*
+" ",*public/css/*,*public/js*
 
 " delimitMate options
 let delimitMate_expand_cr=0

@@ -25,9 +25,9 @@ nnoremap <Leader>e :enew<CR>
 " Looper buffers
 "let g:buffergator_mru_cycle_loop = 1
 " Go to the previous buffer open
-nnoremap <leader>jj :BuffergatorMruCyclePrev<cr>
+nnoremap <leader>kk :BuffergatorMruCyclePrev<cr>
 " Go to the next buffer open
-nnoremap <leader>kk :BuffergatorMruCycleNext<cr>
+nnoremap <leader>jj :BuffergatorMruCycleNext<cr>
 " View the entire list of buffers open
 nnoremap <leader>bl :BuffergatorOpen<cr>
 " To open a new empty buffer
@@ -35,6 +35,11 @@ nnoremap <leader>T :enew<cr>
 " Close the current buffer and move to the previous one
 " This replicates the idea of closing a tab
 nnoremap <leader>bq :bp <BAR> bd #<cr>
+
+
+nnoremap <silent><F3> :Ack<CR>
+nmap <silent><RIGHT> :cnext<CR>
+nmap <silent><LEFT> :cprev<CR>
 
 " window keys
 nnoremap <Leader>w< <C-w><
@@ -44,6 +49,8 @@ nnoremap <Leader>w+ <C-w>+
 nnoremap <Leader>ws :split<CR>
 nnoremap <Leader>wv :vsplit<CR>
 nnoremap <Leader>wx :close<CR>
+
+nnoremap <Leader>w <c-w>
 
 " %% to expand active buffer location on cmdline
 cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
@@ -57,7 +64,7 @@ nnoremap <Leader>pb :CtrlPBuffer<CR>
 
 " Function keys
 nnoremap <silent> <F2> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
-nnoremap <F3> :set hlsearch!<CR>
+nnoremap <Leader><F3> :set hlsearch!<CR>
 nnoremap <F6> :source $HOME/.config/nvim/init.vim<CR>
 nnoremap <F5> :NERDTreeToggle<CR>
 nnoremap <F7> :UndotreeToggle<CR>
@@ -78,7 +85,7 @@ nnoremap <Leader>3 :NumbersToggle<CR>
 " nnoremap <C-s> <C-a>
 
 " Word count selection
-vnoremap <Leader>w :w !wc -w<CR>
+" vnoremap <Leader>w :w !wc -w<CR>
 
 
 " vim paste mode toggle (for fixing indentation issues when pasting text)
@@ -121,8 +128,8 @@ map <Leader>L <Plug>(easymotion-bd-jk)
 nmap <Leader>L <Plug>(easymotion-overwin-line)
 "
 " " Move to word
-map  <Leader>w <Plug>(easymotion-bd-w)
-nmap <Leader>w <Plug>(easymotion-overwin-w)
+" map  <Leader>w <Plug>(easymotion-bd-w)
+" nmap <Leader>w <Plug>(easymotion-overwin-w)
 
 " you complete me
 let g:ycm_key_list_select_completion = ['<tab>', '<Down>']
@@ -132,7 +139,7 @@ let g:SuperTabDefaultCompletionType = '<tab>'
 let g:UltiSnipsExpandTrigger = "<C-y>"
 let g:UltiSnipsJumpForwardTrigger = "<C-y>"
 let g:UltiSnipsJumpBackwardTrigger = "<C-b>"
-
+nnoremap <Leader>g :YcmCompleter GoToDefinition<CR>
 " neomake
 "nmap <Leader><Space>o :lopen<CR>
 "nmap <Leader><Space>c :lclose<CR>

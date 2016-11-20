@@ -13,6 +13,7 @@ Plug 'w0ng/vim-hybrid'
 Plug 'Valloric/YouCompleteMe'
 Plug 'ervandew/supertab'
 Plug 'benekastah/neomake'
+Plug 'mileszs/ack.vim'
 " Plug 'Shougo/deoplete.nvim'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'SirVer/ultisnips'
@@ -24,6 +25,7 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'vim-utils/vim-husk'
 
 " editing
+Plug 'mhinz/vim-startify'
 Plug 'jeetsukumaran/vim-buffergator'
 Plug 'wikitopian/hardmode'
 Plug 'easymotion/vim-easymotion'
