@@ -1,4 +1,5 @@
 /home/craig/.Xmodmap
+/home/craig/.xsessionrc
 /home/craig/.config/nvim/init.vim
 /home/craig/.config/nvim/config/airline.vimrc
 /home/craig/.config/nvim/config/general.vimrc
