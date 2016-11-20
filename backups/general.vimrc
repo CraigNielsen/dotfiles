@@ -27,9 +27,9 @@ set cursorline
 
 set showcmd		" display incomplete commands
 
-if has('mouse')
-  set mouse=a
-endif
+"if has('mouse')
+"  set mouse=a
+"endif
 
 if has("autocmd")
 
@@ -68,7 +68,7 @@ set smartindent
 set nrformats-=octal
 
 set ttimeout
-set ttimeoutlen=100
+set ttimeoutlen=0
 
 " detect .md as markdown instead of modula-2
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
@@ -90,6 +90,8 @@ set magic " for regular expressions
 if &listchars ==# 'eol:$'
   set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
 endif
+
+
 
 if has('path_extra')
   setglobal tags-=./tags tags^=./tags;

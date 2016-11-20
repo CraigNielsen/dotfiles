@@ -13,6 +13,7 @@ Plug 'w0ng/vim-hybrid'
 Plug 'Valloric/YouCompleteMe'
 Plug 'ervandew/supertab'
 Plug 'benekastah/neomake'
+Plug 'mileszs/ack.vim'
 " Plug 'Shougo/deoplete.nvim'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'SirVer/ultisnips'
@@ -24,6 +25,8 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'vim-utils/vim-husk'
 
 " editing
+Plug 'mhinz/vim-startify'
+Plug 'jeetsukumaran/vim-buffergator'
 Plug 'wikitopian/hardmode'
 Plug 'easymotion/vim-easymotion'
 Plug 'junegunn/vim-easy-align'
@@ -53,7 +56,7 @@ Plug 'othree/yajs.vim'
 " Plug 'othree/javascript-libraries-syntax.vim'
 Plug '1995eaton/vim-better-javascript-completion'
 Plug 'gavocanov/vim-js-indent'
-Plug 'ternjs/tern_for_vim', { 'for': ['javascript', 'javascript.jsx'] }
+" Plug 'ternjs/tern_for_vim', { 'for': ['javascript', 'javascript.jsx'] }
 " Plug 'carlitux/deoplete-ternjs', { 'for': ['javascript', 'javascript.jsx'] }
 Plug 'othree/jspc.vim', { 'for': ['javascript', 'javascript.jsx'] }
 Plug 'digitaltoad/vim-jade'

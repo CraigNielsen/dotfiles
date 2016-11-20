@@ -1,4 +1,3 @@
-/home/craig/.i3/config
 /home/craig/.Xmodmap
 /home/craig/.config/nvim/init.vim
 /home/craig/.config/nvim/config/airline.vimrc
