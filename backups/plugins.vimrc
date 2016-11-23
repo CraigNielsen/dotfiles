@@ -9,7 +9,7 @@ autocmd! BufWritePost * Neomake
 "let g:neomake_open_list = 2
 "emmet irritation
 let g:user_emmet_leader_key='<C-Z>'
-"let g:neomake_javascript_enabled_makers = ['eslint']
+let g:neomake_javascript_enabled_makers = ['eslint']
 
 " silver searcher
 let g:ackprg = 'ag --nogroup --nocolor --column'

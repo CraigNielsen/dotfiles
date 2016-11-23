@@ -20,14 +20,14 @@ nnoremap <Leader>bl :bl<CR>
 nnoremap <Leader>bw :w<CR>:bd<CR>
 nnoremap <Leader>bd :bd!<CR>
 " new buffer/tab
-nnoremap <Leader>e :enew<CR>
+" nnoremap <Leader>e :enew<CR>
 
 " Looper buffers
 "let g:buffergator_mru_cycle_loop = 1
 " Go to the previous buffer open
-nnoremap <leader>kk :BuffergatorMruCyclePrev<cr>
+nnoremap <leader>jj :BuffergatorMruCyclePrev<cr>
 " Go to the next buffer open
-nnoremap <leader>jj :BuffergatorMruCycleNext<cr>
+nnoremap <leader>kk :BuffergatorMruCycleNext<cr>
 " View the entire list of buffers open
 nnoremap <leader>bl :BuffergatorOpen<cr>
 " To open a new empty buffer
