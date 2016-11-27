@@ -15,7 +15,7 @@ Plug 'ervandew/supertab'
 Plug 'benekastah/neomake'
 Plug 'mileszs/ack.vim'
 " Plug 'Shougo/deoplete.nvim'
-Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'scrooloose/nerdtree'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'isRuslan/vim-es6'
