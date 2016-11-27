@@ -50,19 +50,20 @@ Plug 'lilydjwg/colorizer', { 'on': 'ColorToggle' }
 Plug 'wavded/vim-stylus'
 
 " javascript
-Plug 'guileen/vim-node-dict'
-Plug 'moll/vim-node'
-Plug 'othree/yajs.vim'
+Plug 'maksimr/vim-jsbeautify'
+"Plug 'guileen/vim-node-dict'
+"Plug 'moll/vim-node'
+"Plug 'othree/yajs.vim'
 " Plug 'othree/javascript-libraries-syntax.vim'
-Plug '1995eaton/vim-better-javascript-completion'
-Plug 'gavocanov/vim-js-indent'
+"Plug '1995eaton/vim-better-javascript-completion'
+"Plug 'gavocanov/vim-js-indent'
 " Plug 'ternjs/tern_for_vim', { 'for': ['javascript', 'javascript.jsx'] }
 " Plug 'carlitux/deoplete-ternjs', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'othree/jspc.vim', { 'for': ['javascript', 'javascript.jsx'] }
-Plug 'digitaltoad/vim-jade'
+"Plug 'othree/jspc.vim', { 'for': ['javascript', 'javascript.jsx'] }
+"Plug 'digitaltoad/vim-jade'
 Plug 'elzr/vim-json'
 Plug 'mxw/vim-jsx'
-Plug 'posva/vim-vue'
+"Plug 'posva/vim-vue'
 
 " elixir
 Plug 'elixir-lang/vim-elixir'

@@ -3,13 +3,22 @@ filetype plugin indent on
 let g:python3_host_prog = '/home/craig/.pyenv/versions/neovim3/bin/python'
 let g:python_host_prog = '/home/craig/.pyenv/versions/neovim2/bin/python'
 " neomake config
-autocmd! BufWritePost * Neomake
+autocmd! BufWritePost,BufEnter * Neomake
 " autocmd BufLeave * QFix
-"let g:neomake_place_signs = 0
-"let g:neomake_open_list = 2
+let g:neomake_place_signs = 1
+let g:neomake_open_list = 0
+let g:neomake_javascript_enabled_makers = ['eslint']
+let g:neomake_jsx_enabled_makers = ['eslint']
+" TODO: check if in project reps with find, then enable eslint
+ if ($PWD == '/home/craig/git_repos/reps/website-service')
+   echo "working in pwd: /home/craig/git_repos/reps/website-service "
+   echo $PWD .'/node_modules/.bin/eslint'
+
+   let g:neomake_javascript_eslint_exe = $PWD .'/node_modules/.bin/eslint'
+endif
+
 "emmet irritation
 let g:user_emmet_leader_key='<C-Z>'
-let g:neomake_javascript_enabled_makers = ['eslint']
 
 " silver searcher
 let g:ackprg = 'ag --nogroup --nocolor --column'
@@ -40,7 +49,7 @@ set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,
 " ",*public/css/*,*public/js*
 
 " delimitMate options
-let delimitMate_expand_cr=0
+let delimitMate_expand_cr=1
 
 " enable matchit (for matching tags with %)
 runtime macros/matchit.vim
