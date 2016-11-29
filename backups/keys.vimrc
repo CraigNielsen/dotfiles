@@ -68,6 +68,7 @@ nnoremap <silent> <F2> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
 nnoremap <Leader><F3> :set hlsearch!<CR>
 nnoremap <F6> :source $HOME/.config/nvim/init.vim<CR>
 nnoremap <F5> :NERDTreeToggle<CR>
+nnoremap <Leader><F5> :NERDTreeFind<CR>
 nnoremap <F7> :UndotreeToggle<CR>
 nnoremap <F8> :Geeknote<CR>
 " indent whole file according to syntax rules
