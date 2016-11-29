@@ -41,6 +41,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'justinmk/vim-sneak'
 Plug 'vim-scripts/camelcasemotion'
+Plug 'scrooloose/nerdcommenter'
 
 " eye candy
 Plug 'myusuf3/numbers.vim'
