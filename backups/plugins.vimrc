@@ -10,9 +10,9 @@ let g:neomake_open_list = 0
 let g:neomake_javascript_enabled_makers = ['eslint']
 let g:neomake_jsx_enabled_makers = ['eslint']
 " TODO: check if in project reps with find, then enable eslint
- if ($PWD == '/home/craig/git_repos/reps/website-service')
-   echo "working in pwd: /home/craig/git_repos/reps/website-service "
-   echo $PWD .'/node_modules/.bin/eslint'
+ if ($PWD == '/home/craig/git_repos/reps')
+   echo "working in pwd: /home/craig/git_repos/reps"
+   echo $PWD .'website-service/node_modules/.bin/eslint'
 
    let g:neomake_javascript_eslint_exe = $PWD .'/node_modules/.bin/eslint'
 endif
