@@ -6,3 +6,4 @@
 /home/craig/.config/nvim/config/keys.vimrc
 /home/craig/.config/nvim/config/plugins.vimrc
 /home/craig/.config/nvim/config/plug.vimrc
+/home/craig/.config/nvim/UltiSnips/python.snippets
