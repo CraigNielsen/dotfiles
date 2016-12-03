@@ -69,6 +69,10 @@ Plug 'mxw/vim-jsx'
 " elixir
 Plug 'elixir-lang/vim-elixir'
 
+" python
+"Plug 'nvie/vim-flake8'
+"Plug 'andviro/flake8-vim'
+Plug 'tell-k/vim-autopep8'
 " other
 Plug 'mattn/emmet-vim'
 Plug 'ciaranm/detectindent'
