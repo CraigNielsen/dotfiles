@@ -73,6 +73,7 @@ Plug 'elixir-lang/vim-elixir'
 "Plug 'nvie/vim-flake8'
 "Plug 'andviro/flake8-vim'
 Plug 'tell-k/vim-autopep8'
+Plug 'klen/python-mode'
 " other
 Plug 'mattn/emmet-vim'
 Plug 'ciaranm/detectindent'
