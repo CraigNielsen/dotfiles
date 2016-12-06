@@ -36,11 +36,16 @@ nnoremap <leader>T :enew<cr>
 " This replicates the idea of closing a tab
 nnoremap <leader>bq :bp <BAR> bd #<cr>
 
+"toggle location lists etc
+let g:lt_location_list_toggle_map = '<leader>c'
+let g:lt_quickfix_list_toggle_map = '<leader>v'
 
 nnoremap <silent><F3> :Ack<CR>
 nmap <silent><RIGHT> :cnext<CR>
 nmap <silent><LEFT> :cprev<CR>
 
+"rename
+nnoremap <Leader>r :%s/\<<C-r><C-w>\>/<C-r><C-w>/g<Left><Left>
 " window keys
 nnoremap <Leader>w< <C-w><
 nnoremap <Leader>w> <C-w>>

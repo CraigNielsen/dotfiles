@@ -16,7 +16,13 @@ let g:neomake_jsx_enabled_makers = ['eslint']
 
    let g:neomake_javascript_eslint_exe = $PWD .'/node_modules/.bin/eslint'
 endif
-
+" autopep8
+let g:autopep8_ignore="E501"
+" pymodelint:
+let g:pymode_lint_cwindow = 0
+let g:pymode_lint_on_write = 1
+let g:pymode_lint_on_fly = 1
+let g:pymode_line_ignore = "E501"
 "emmet irritation
 let g:user_emmet_leader_key='<C-Z>'
 
@@ -44,6 +50,8 @@ colorscheme gruvbox
 let g:ctrlp_prompt_mappings={'PrtClearCache()':['<Leader><F5>']}
 let g:ctrlp_prompt_mappings={'PrtdeleteEnt()':['<Leader><F7>']}
 let g:ctrlp_match_window='bottom,order:btt,min:2,max:25'
+let g:ctrlp_working_path_mode = 2
+" let g:ctrlp_root_markers = ['.git']
 set wildmenu " enhanced autocomplete
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*node_modules*,*.jpg,*.png,*.svg,*.ttf,*.woff,*.woff3,*.eot
 " ",*public/css/*,*public/js*

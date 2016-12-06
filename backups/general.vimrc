@@ -73,7 +73,8 @@ set ttimeoutlen=0
 
 " detect .md as markdown instead of modula-2
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
-
+"folding
+set nofoldenable
 " Unix as standard file type
 set ffs=unix,dos,mac
 
