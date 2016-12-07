@@ -14,6 +14,7 @@ Plug 'Valloric/YouCompleteMe'
 Plug 'ervandew/supertab'
 Plug 'benekastah/neomake'
 Plug 'mileszs/ack.vim'
+Plug 'tpope/vim-fugitive'
 " Plug 'Shougo/deoplete.nvim'
 Plug 'scrooloose/nerdtree',
 Plug 'SirVer/ultisnips'

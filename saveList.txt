@@ -1,5 +1,6 @@
 /home/craig/.Xmodmap
 /home/craig/.xsessionrc
+/home/craig/.i3/config
 /home/craig/.config/nvim/init.vim
 /home/craig/.config/nvim/config/airline.vimrc
 /home/craig/.config/nvim/config/general.vimrc
@@ -7,3 +8,4 @@
 /home/craig/.config/nvim/config/plugins.vimrc
 /home/craig/.config/nvim/config/plug.vimrc
 /home/craig/.config/nvim/UltiSnips/python.snippets
+/home/craig/vim_projects/pricing.vim

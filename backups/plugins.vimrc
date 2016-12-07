@@ -23,7 +23,7 @@ let g:pymode_lint_cwindow = 0
 let g:pymode_lint_on_write = 1
 let g:pymode_lint_on_fly = 1
 let g:pymode_line_ignore = "E501"
-let g:pymode_run_bind = '<C-r>'
+let g:pymode_run_bind = '<SHIFT><C-r>'
 "emmet irritation
 let g:user_emmet_leader_key='<C-Z>'
 
