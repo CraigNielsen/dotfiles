@@ -9,3 +9,6 @@
 /home/craig/.config/nvim/config/plug.vimrc
 /home/craig/.config/nvim/UltiSnips/python.snippets
 /home/craig/vim_projects/pricing.vim
+/home/craig/vim_projects/remove_prefix.py
+/home/craig/vim_projects/testthis.sh
+
