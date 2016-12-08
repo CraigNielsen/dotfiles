@@ -8,15 +8,18 @@ nmap <Leader>j gj
 nmap <Leader>k gk
 " vim fugitive
 nmap <Leader>mg :Gstatus<CR>
-
+" craigs customs
+" l2 == leader2
+" l2 Test This
+map <leader>mtt :!/home/craig/vim_projects/testthis.sh %:p<CR>
 
 " hard mode config
 nnoremap <Leader>h <Esc>:call ToggleHardMode()<CR>
 
 " buffer keys
 nnoremap <Leader>bb :b#<CR>
-nnoremap <Leader>bn :bn<CR>
-nnoremap <Leader>bp :bp<CR>
+"nnoremap <Leader>bn :bn<CR>
+"nnoremap <Leader>bp :bp<CR>
 nnoremap <Leader>bf :bf<CR>
 nnoremap <Leader>bl :bl<CR>
 nnoremap <Leader>bw :w<CR>:bd<CR>
@@ -25,11 +28,15 @@ nnoremap <Leader>bd :bd!<CR>
 " nnoremap <Leader>e :enew<CR>
 
 " Looper buffers
-"let g:buffergator_mru_cycle_loop = 1
+let g:buffergator_mru_cycle_loop = 0
+let g:buffergator_sort_regime = "mru"
+
 " Go to the previous buffer open
-nnoremap <leader>jj :BuffergatorMruCyclePrev<cr>
+nnoremap <leader>j :bp<cr>
+nnoremap <leader>bp :BuffergatorMruCyclePrev<cr>
 " Go to the next buffer open
-nnoremap <leader>kk :BuffergatorMruCycleNext<cr>
+nnoremap <leader>k :bn<cr>
+nnoremap <leader>bn :BuffergatorMruCycleNext<cr>
 " View the entire list of buffers open
 nnoremap <leader>bl :BuffergatorOpen<cr>
 " To open a new empty buffer

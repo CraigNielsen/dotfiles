@@ -15,6 +15,7 @@ Plug 'ervandew/supertab'
 Plug 'benekastah/neomake'
 Plug 'mileszs/ack.vim'
 Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-rooter'
 " Plug 'Shougo/deoplete.nvim'
 Plug 'scrooloose/nerdtree',
 Plug 'SirVer/ultisnips'

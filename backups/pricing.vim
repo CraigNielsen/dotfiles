@@ -2,19 +2,20 @@ let SessionLoad = 1
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
 silent only
-cd ~/
+cd ~/git_repos/reps
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +136 git_repos/reps/backend-service/backend/legacy/sync/insert_orders.py
-badd +157 git_repos/reps/backend-service/backend/legacy/sync/tests/test_insert_inv_rows_for_bsop.py
-badd +14 git_repos/reps/backend-service/backend/stock/pricing.py
-badd +27 git_repos/reps/backend-service/backend/stock/tests/test_pricing.py
-badd +0 git_repos/reps/backend-service/backend/legacy/sync/upsert_products.py
+badd +106 backend-service/backend/legacy/sync/insert_orders.py
+badd +186 backend-service/backend/legacy/sync/tests/test_insert_inv_rows_for_bsop.py
+badd +19 backend-service/backend/stock/pricing.py
+badd +26 backend-service/backend/stock/tests/test_pricing.py
+badd +144 backend-service/backend/legacy/sync/upsert_products.py
+badd +0 backend-service/backend/models/tests/test_insert_orders.py
 argglobal
 silent! argdel *
-edit git_repos/reps/backend-service/backend/legacy/sync/upsert_products.py
+edit backend-service/backend/models/tests/test_insert_orders.py
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -29,13 +30,12 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 144 - ((54 * winheight(0) + 37) / 74)
+let s:l = 78 - ((57 * winheight(0) + 37) / 74)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-144
-normal! 037|
-lcd ~/git_repos/reps/backend-service/backend/legacy/sync
+78
+normal! 040|
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
