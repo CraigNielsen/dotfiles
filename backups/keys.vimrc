@@ -6,6 +6,8 @@ nnoremap <Leader>; ,
 " in-line scrolling
 nmap <Leader>j gj
 nmap <Leader>k gk
+" vim fugitive
+nmap <Leader>mg :Gstatus<CR>
 
 
 " hard mode config
