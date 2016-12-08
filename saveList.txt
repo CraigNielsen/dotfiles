@@ -11,4 +11,3 @@
 /home/craig/vim_projects/pricing.vim
 /home/craig/vim_projects/remove_prefix.py
 /home/craig/vim_projects/testthis.sh
-
