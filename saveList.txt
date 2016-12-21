@@ -2,4 +2,5 @@
 /home/craig/.xsessionrc
 /home/craig/.i3/config
 /home/craig/saveState.sh
+/home/craig/loadState.sh
 /home/craig/.config/nvim/init.vim
