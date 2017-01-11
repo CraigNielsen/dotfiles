@@ -18,6 +18,6 @@ cd /home/craig/git_repos/dotfiles
 python saveConfig.py
 git add .
 git commit
-echo 'pushing vim config files'
+echo 'pushing dotfiles files'
 git push
 
