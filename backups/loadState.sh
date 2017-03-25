@@ -9,8 +9,5 @@ cd /home/craig/.config/nvim/config
 echo 'pulling vim config files'
 git pull
 cd /home/craig/git_repos/dotfiles
-echo 'pulling dotfiles files'
-git pull
-cd /home/craig/git_repos/craig_help
-echo 'pulling dotfiles files'
+echo 'pulling dotfiles'
 git pull
