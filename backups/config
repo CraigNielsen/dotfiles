@@ -158,22 +158,22 @@ bar {
 
 bindsym $mod+q workspace back_and_forth
 bindsym $mod+Shift+m exec sudo ./git_repos/dotfiles/static_helpers/mountall.sh
-bindsym $mod+c exec google-chrome
+bindsym $mod+c exec chromium --force-device-scale-factor=1.3
 bindsym $mod+Shift+t exec atom
 bindsym $mod+Shift+p exec ./pycharm-145.597.11/bin/pycharm.sh
 bindsym $mod+Shift+s exec --no-startup-id "i3lock -c 333333; systemctl suspend"
 #bindsym $mod+Shift+x exec --no-startup-id "i3lock -c 333333; sleep 1; xset dpms force off"
+bindsym $mod+Shift+x exec xmodmap /home/craig/.Xmodmap
 bindsym $mod+F9 exec amixer -q set Master toggle
 bindsym $mod+F10 exec amixer -q set Master 7%- unmute
 bindsym $mod+F11 exec amixer -q set Master 7%+ unmute
+bindsym $mod+F6 exec .screenlayout/work.sh
 bindsym $mod+F5 exec .screenlayout/screen1.sh
-bindsym $mod+F6 exec .screenlayout/screen_setup.sh
 bindsym $mod+F7 exec .screenlayout/port.sh
 bindsym $mod+Shift+k exec docker-compose -f /home/craig/git_repos/reps/ops/dev.yml down
 bindsym $mod+p exec gwenview
 bindsym $mod+n exec thunar
 bindsym $mod+Shift+F10 exec shutter
-bindsym $mod+Shift+x exec xmodmap .Xmodmap
 
 bindsym XF86AudioLowerVolume exec amixer -q set Master 7%- unmute
 bindsym XF86AudioRaiseVolume exec amixer -q set Master 7%+ unmute
