@@ -1,4 +1,14 @@
 #!/bin/zsh
+if [ $PWD=='/home/craig' ]
+then
+  echo "in debian"
+  python loadConfig.py debSave.txt
+elif [ $PWD=='/craig.ferguson' ]
+then
+  echo "in mac"
+  python loadConfig.py macSave.txt
+fi
+
 cd $PWD/.config/nvim/UltiSnips
 echo 'pulling UltiSnips'
 git pull
