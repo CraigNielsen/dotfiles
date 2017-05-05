@@ -1,6 +1,16 @@
 #!/bin/zsh
-cd $PWD/git_repos/dotfiles
-python saveConfig.py $1
+cd $PWD/git_repos/dotfiles;
+
+if [ $PWD=='/home/craig' ]
+then
+  echo "in debian"
+  python saveConfig.py debSave.txt
+elif [ $PWD=='/craig.ferguson' ]
+then
+  echo "in mac"
+  python saveConfig.py macSave.txt
+fi
+
 cd $PWD/.config/nvim/UltiSnips
 git add .
 git commit
