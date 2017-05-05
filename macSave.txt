@@ -1,0 +1,5 @@
+/Users/craig.ferguson/saveState.sh
+/Users/craig.ferguson/loadState.sh
+/Users/craig.ferguson/.pylintrc
+/Users/craig.ferguson/.zpreztorc
+/Users/craig.ferguson/.config/nvim/init.vim
