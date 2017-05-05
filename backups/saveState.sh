@@ -1,20 +1,20 @@
 #!/bin/zsh
-cd /home/craig/.config/nvim/UltiSnips
+cd $1/.config/nvim/UltiSnips
 git add .
 git commit
 echo 'pushing UltiSnips'
 git push
-cd /home/craig/vim_projects
+cd $1/vim_projects
 git add .
 git commit
 echo 'pushing vim_projects'
 git push
-cd /home/craig/.config/nvim/config
+cd $1/.config/nvim/config
 git add .
 git commit
 echo 'pushing vim config files'
 git push
-cd /home/craig/git_repos/dotfiles
+cd $1/git_repos/dotfiles
 python saveConfig.py
 git add .
 git commit

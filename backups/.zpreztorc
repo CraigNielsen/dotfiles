@@ -1,0 +1,84 @@
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
+alias vim=nvim
+alias v=vim .
+alias dc=docker-compose
+eval $(thefuck --alias f)
+
+export PIP_REQUIRE_VIRTUALENV=true
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+setopt correct
+setopt correctall
+
+zstyle ':prezto:load' pmodule \
+         'environment' \
+         'terminal' \
+         'editor' \
+         'history' \
+         'directory' \
+         'spectrum' \
+         'utility' \
+         'completion' \
+         'git' \
+         'syntax-highlighting' \
+         'history-substring-search' \
+         'prompt'
+zstyle ':prezto:module:prompt' theme 'agnoster'
+
+dcc() {
+  dc ps | grep Exit
+}
+dcu() {
+  dc up -d --force-recreate $1
+}
+odev() {
+cd workspace/dev-environments/docker-environment/collections && source compose.env
+cd ~/workspace/dev-environments/docker-environment/collections/shared/wms-staging/
+}
+dev() {
+cd workspace/dev-environments/docker-environment/collections && source compose.env
+cd ~/workspace/cdev/$1
+}
+test() {
+  osascript -e 'tell application "iTerm" to activate'
+}
+devup() {
+cd ~/workspace/dev-environments/docker-environment/collections && source compose.env
+cd ~/workspace/cdev/$1
+dc up --force-recreate;
+}
+devad() {
+cd ~/workspace/dev-environments/docker-environment/collections && source compose.env
+cd ~/workspace/cdev/adaptris
+dc exec adaptris pip install pytest pytest-watch;
+dc exec adaptris bash -c 'cd tal/services/adaptris/test; ptw -- -x --lf;';
+}
+
+code-on() {
+  git checkout -b ${USER}-$1 origin/master
+}
+
+gpush() {
+  local branch=`git rev-parse --abbrev-ref HEAD`
+  [[ "$branch" == "master" ]] && echo "should be on feature branch" && return 1
+  git push origin HEAD:$branch $@
+}
+
+gpr() {
+  local branch=`git rev-parse --abbrev-ref HEAD`
+  [[ "$branch" == "master" ]] && echo "should be on feature branch" && return 1
+  git push origin HEAD:$branch || return 1
+  hub pull-request -h $branch
+}
+
+#grelease() {
+  #local branch=`git rev-parse --abbrev-ref HEAD`
+  #[[ "$branch" == "master" ]] && echo "should be on feature branch" && return 1
+  #git pull --rebase || return 1
+  #git push origin HEAD:$branch -f || return 1
+  #git push origin HEAD:master || return 1
+  #git checkout master || return 1
+  #git push origin :$branch || return 1
+  #git branch -d $branch || return 1
+#}
