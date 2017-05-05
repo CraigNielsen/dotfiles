@@ -9,4 +9,9 @@ cd $1/.config/nvim/config
 echo 'pulling vim config files'
 git pull
 cd $1/git_repos/dotfiles
+echo 'pulling dotfiles'
 git pull
+#_____
+cd $1/workspace/cdev
+git pull
+echo 'pulling takealot dev files'

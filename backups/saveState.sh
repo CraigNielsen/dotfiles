@@ -9,6 +9,13 @@ git add .
 git commit
 echo 'pushing vim_projects'
 git push
+#_____
+cd $1/workspace/cdev
+git add .
+git commit
+echo 'pushing takealot dev files'
+git push
+#_____
 cd $1/.config/nvim/config
 git add .
 git commit
@@ -18,11 +25,6 @@ cd $1/git_repos/dotfiles
 python saveConfig.py
 git add .
 git commit
-echo 'pushing dotfiles files'
-git push
-cd /home/craig/git_repos/craig_help
-git add .
-git commit
-echo 'pushing craig_help files'
+echo 'pushing vim config files'
 git push
 
