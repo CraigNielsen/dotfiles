@@ -1,5 +1,6 @@
 #!/bin/zsh
-
+cd $HOME
+./saveState.sh
 cd $HOME/git_repos/dotfiles
 echo 'pulling dotfiles files'
 git pull
