@@ -16,6 +16,7 @@ git add .
 git commit
 echo 'pushing UltiSnips'
 git push
+#_____
 cd $HOME/vim_projects
 git add .
 git commit
@@ -33,12 +34,7 @@ git add .
 git commit
 echo 'pushing vim config files'
 git push
-cd $HOME/git_repos/dotfiles
-python saveConfig.py
-git add .
-git commit
-echo 'pushing dotfiles files'
-git push
+#_____
 cd $HOME/git_repos/craig_help
 git add .
 git commit

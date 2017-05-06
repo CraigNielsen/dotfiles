@@ -4,6 +4,8 @@ alias vim=nvim
 alias v=vim .
 alias dc=docker-compose
 eval $(thefuck --alias f)
+fpath=(~/.zsh/completion $fpath)
+autoload -Uz compinit && compinit -i
 
 export PIP_REQUIRE_VIRTUALENV=true
 eval "$(pyenv init -)"
