@@ -20,6 +20,9 @@ git pull
 cd $HOME/vim_projects
 echo 'pulling vim_projects'
 git pull
+cd $HOME/.zprezto
+echo 'pulling zprezto config files'
+git pull
 cd $HOME/.config/nvim/config
 echo 'pulling vim config files'
 git pull
