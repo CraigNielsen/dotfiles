@@ -11,12 +11,6 @@ then
   python saveConfig.py macSave.txt
 fi
 
-cd $HOME/.zprezto/
-git add .
-git commit
-echo 'pushing preztorc'
-git push
-#_____
 cd $HOME/.config/nvim/UltiSnips
 git add .
 git commit
@@ -39,6 +33,12 @@ cd $HOME/.config/nvim/config
 git add .
 git commit
 echo 'pushing vim config files'
+git push
+#_____
+cd $HOME/git_repos/dotfiles
+git add .
+git commit
+echo 'pushing dotfiles files'
 git push
 #_____
 cd $HOME/git_repos/craig_help
