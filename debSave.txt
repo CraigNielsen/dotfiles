@@ -4,5 +4,3 @@
 /home/craig/saveState.sh
 /home/craig/loadState.sh
 /home/craig/.pylintrc
-/home/craig/.zpreztorc
-/home/craig/.config/nvim/init.vim
