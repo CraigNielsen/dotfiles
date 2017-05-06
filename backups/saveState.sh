@@ -1,56 +1,53 @@
 #!/bin/zsh
 cd $HOME/git_repos/dotfiles;
 
-if [ $HOME=='/home/craig' ]
+if [[ $HOME == '/home/craig' ]]
 then
   echo "in debian"
   python saveConfig.py debSave.txt
-elif [ $HOME=='/craig.ferguson' ]
+elif [[ $HOME == '/craig.ferguson' ]]
 then
   echo "in mac"
   python saveConfig.py macSave.txt
 fi
 
+check() {
+  print $PWD
+  a=$(git status | grep -c "modified")
+  if [[ $a > 0 ]]
+  then
+    echo $1" has been modified"
+    git add .
+    git commit
+    git push
+  else
+    echo 'moving on'
+  fi
+}
 cd $HOME/.config/nvim/UltiSnips
-git add .
-git commit
-echo 'pushing UltiSnips'
-git push
+check "ultisnips"
+echo ''
 #_____
 cd $HOME/vim_projects
-git add .
-git commit
-echo 'pushing vim_projects'
-git push
+check 'vim projects'
+echo ''
 #_____
 cd $HOME/workspace/cdev
-git add .
-git commit
-echo 'pushing takealot dev files'
-git push
+check 'takealot dev'
+echo ''
 #_____
 cd $HOME/.config/nvim/config
-git add .
-git commit
-echo 'pushing vim config files'
-git push
+check 'nvim config'
+echo ''
 #_____
 cd $HOME/git_repos/dotfiles
-git add .
-git commit
-echo 'pushing dotfiles files'
-git push
+check 'dotfiles'
+echo ''
 #_____
 cd $HOME/git_repos/craig_help
-git add .
-git commit
-echo 'pushing craig_help files'
-git push
-
+check 'craig help files'
+echo ''
 #_____
 cd $HOME/.zprezto
-git add .
-git commit
-echo 'pushing zprezto files'
-git push
-
+check 'zprezto repo'
+echo ''
