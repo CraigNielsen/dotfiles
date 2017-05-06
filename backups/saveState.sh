@@ -20,8 +20,6 @@ check() {
     git add .
     git commit
     git push
-  else
-    echo 'moving on'
   fi
 }
 cd $HOME/.config/nvim/UltiSnips
