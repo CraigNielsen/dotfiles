@@ -11,11 +11,18 @@ then
   python saveConfig.py macSave.txt
 fi
 
+cd $HOME/.zprezto/
+git add .
+git commit
+echo 'pushing preztorc'
+git push
+#_____
 cd $HOME/.config/nvim/UltiSnips
 git add .
 git commit
 echo 'pushing UltiSnips'
 git push
+#_____
 cd $HOME/vim_projects
 git add .
 git commit
