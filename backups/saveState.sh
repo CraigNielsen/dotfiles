@@ -47,3 +47,10 @@ git commit
 echo 'pushing craig_help files'
 git push
 
+#_____
+cd $HOME/.zprezto
+git add .
+git commit
+echo 'pushing zprezto files'
+git push
+
