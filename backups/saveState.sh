@@ -5,7 +5,7 @@ if [[ $HOME == '/home/craig' ]]
 then
   echo "in debian"
   python saveConfig.py debSave.txt
-elif [[ $HOME == '/craig.ferguson' ]]
+elif [[ $HOME == 'Users/craig.ferguson' ]]
 then
   echo "in mac"
   python saveConfig.py macSave.txt
@@ -15,6 +15,14 @@ check() {
   print $PWD
   a=$(git status | grep -c "modified")
   if [[ $a > 0 ]]
+  then
+    echo $1" has been modified"
+    git add .
+    git commit
+    git push
+  fi
+  b=$(git status | grep -c "untracked")
+  if [[ $b > 0 ]]
   then
     echo $1" has been modified"
     git add .
