@@ -167,9 +167,8 @@ bindsym $mod+Shift+g exec --no-startup-id "i3lock -c 333333; systemctl suspend"
 bindsym $mod+F9 exec amixer -q set Master toggle
 bindsym $mod+F10 exec amixer -q set Master 7%- unmute
 bindsym $mod+F11 exec amixer -q set Master 7%+ unmute
-bindsym $mod+F6 exec .screenlayout/work.sh
-bindsym $mod+F5 exec .screenlayout/screen1.sh
-bindsym $mod+F7 exec .screenlayout/port.sh
+bindsym $mod+F5 exec ~/.screenlayout/port.sh
+bindsym $mod+F6 exec ~/.screenlayout/screen_setup.sh
 bindsym $mod+Shift+k exec docker-compose -f /home/craig/git_repos/reps/ops/dev.yml down
 bindsym $mod+p exec gwenview
 bindsym $mod+n exec thunar
