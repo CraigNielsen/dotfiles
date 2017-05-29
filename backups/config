@@ -67,10 +67,10 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split in horizontal orientation
-# bindsym $mod+Shift+h split h
+ bindsym $mod+Shift+j split h
 
 # split in vertical orientation
-# bindsym $mod+v split v
+ bindsym $mod+v split v
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
@@ -172,6 +172,7 @@ bindsym $mod+F6 exec ~/.screenlayout/screen_setup.sh
 bindsym $mod+Shift+k exec docker-compose -f /home/craig/git_repos/reps/ops/dev.yml down
 bindsym $mod+p exec gwenview
 bindsym $mod+n exec thunar
+bindsym $mod+Shift+n exec nautilus
 bindsym $mod+Shift+F10 exec shutter
 bindsym $mod+Shift+x exec xmodmap .Xmodmap
 
