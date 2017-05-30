@@ -158,7 +158,7 @@ bar {
 
 bindsym $mod+q workspace back_and_forth
 bindsym $mod+Shift+m exec sudo ./git_repos/dotfiles/static_helpers/mountall.sh
-bindsym $mod+c exec chromium --force-device-scale-factor=0.5
+bindsym $mod+c exec chromium --force-device-scale-factor=1
 bindsym $mod+Shift+t exec atom
 #bindsym $mod+Shift+p exec ./pycharm-145.597.11/bin/pycharm.sh
 bindsym $mod+Shift+s exec --no-startup-id "i3lock -i ~/Pictures/ie.png -c 000000"
