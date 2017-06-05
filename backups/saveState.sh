@@ -54,8 +54,8 @@ cd $HOME/git_repos/craig_help
 check 'craig help files'
 echo ''
 #_____
-cp $HOME/.zpreztorc $HOME/.zprezto
-cd $HOME/.zprezto
+cp $HOME/.zpreztorc $HOME/.zprezto/
+cd $HOME/.zprezto/
 check 'zprezto repo'
 echo ''
 cd $HOME/scripts
