@@ -32,3 +32,7 @@ echo 'pulling dotfiles files'
 cd $HOME/workspace/cdev
 git pull
 echo 'pulling takealot dev files'
+#_____
+cd $HOME/scripts
+git pull
+echo 'pulling debian i3 scripts'
