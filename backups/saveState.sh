@@ -58,6 +58,3 @@ cp $HOME/.zpreztorc $HOME/.zprezto/
 cd $HOME/.zprezto/
 check 'zprezto repo'
 echo ''
-cd $HOME/scripts
-check 'debian i3 scripts repo'
-echo ''
