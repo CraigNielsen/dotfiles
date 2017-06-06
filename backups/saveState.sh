@@ -26,7 +26,7 @@ check() {
   then
     echo $1" has been modified"
     git add .
-    git commit
+    git commit -m 'updated'
     git push
   fi
 }
