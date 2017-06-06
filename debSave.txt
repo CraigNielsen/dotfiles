@@ -3,4 +3,5 @@
 /home/craig/.i3/config
 /home/craig/saveState.sh
 /home/craig/loadState.sh
+/home/craig/.zpreztorc
 /home/craig/.pylintrc

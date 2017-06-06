@@ -2,16 +2,47 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 alias vim=nvim
 alias v=vim .
+alias keys="vim $HOME/keys.vimrc"
 alias dc=docker-compose
+alias k="kubectl"
+alias n="nautilus"
+alias mbs="cd $HOME/git_repos/mybondsite/backend;"
+alias ksetup="source <(kubectl completion zsh)"
+alias kc="kubectl create"
+alias keys="vim $HOME/.vimkeys.vimrc"
+alias kgp="kubectl get pods -owide --all-namespaces"
+alias kdd="kubectl delete deployment"
+alias minikubedocker='eval $(minikube docker-env)'
+alias minikubedockerexit='eval $(minikube docker-env -u)'
+
+alias reload='exec $SHELL -l'
+alias pj='cd ~/git_repos/psychicjenha/frontend'
+alias tk='cd ~/workspace/dev-environments/kubernetes-environments'
+alias set="source <(kubectl completion zsh)"
+alias pa="pyenv activate data-science; python"
+alias config="vim ~/.zpreztorc;"
+alias python=ipython
+alias edit='vim ~/.zpreztorc'
 eval $(thefuck --alias f)
 fpath=(~/.zsh/completion $fpath)
 autoload -Uz compinit && compinit -i
 
+
+alias gst="git status"
+
+#temps
+alias sock='cd ~/git_repos; pyenv activate data-science;python -m sockets.server.server'
+alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
+alias ss='cd ~/workspace/s4f-sick-integration-service/'
+#end temps
 export PIP_REQUIRE_VIRTUALENV=true
+export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
+export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
+export PATH=$PATH:/opt
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 setopt correct
-setopt correctall
+unsetopt correctall
 
 zstyle ':prezto:load' pmodule \
          'environment' \
@@ -27,6 +58,42 @@ zstyle ':prezto:load' pmodule \
          'history-substring-search' \
          'prompt'
 zstyle ':prezto:module:prompt' theme 'agnoster'
+savehelp() {
+  echo "$@[2,-1]" >> $HOME/git_repos/craig_help/$1
+}
+envv() {
+  if [[ $# -eq 0 ]]
+    then
+      env
+    else
+      env | grep -i $1
+  fi
+}
+restartn() {
+  sudo service networking restart;
+  sudo service network-manager restart;
+}
+pullta() {
+  a=$(git status | grep -c "modified")
+  if [[ $a > 0 ]]
+  then
+    echo ''
+    echo 'you have changes';
+    echo ''
+  else
+    git pull
+  fi
+}
+
+checkta() {
+  for foldr in ~/workspace/*/;
+    do
+      cd foldr;
+      echo "$foldr"
+      git fetch;
+      pullta
+    done;
+}
 
 dcc() {
   dc ps | grep Exit
@@ -47,6 +114,10 @@ cd ~/workspace/dev-environments/docker-environment/collections && source compose
 cd ~/workspace/cdev/$1
 dc up --force-recreate;
 }
+h() {
+  cd ~/git_repos/craig_help
+  ls;
+}
 devad() {
 cd ~/workspace/dev-environments/docker-environment/collections && source compose.env
 cd ~/workspace/cdev/adaptris
@@ -55,32 +126,34 @@ dc exec adaptris bash -c 'cd tal/services/adaptris/test; ptw -- -x --lf;';
 }
 
 code-on() {
-  git checkout -b ${USER}-$1 origin/master
+  git checkout -b $1 origin/master
 }
+
 
 gpush() {
   local branch=`git rev-parse --abbrev-ref HEAD`
   [[ "$branch" == "master" ]] && echo "should be on feature branch" && return 1
   git push origin HEAD:$branch $@
 }
-
 gpr() {
   local branch=`git rev-parse --abbrev-ref HEAD`
   [[ "$branch" == "master" ]] && echo "should be on feature branch" && return 1
   git push origin HEAD:$branch || return 1
   hub pull-request -h $branch
 }
+grelease() {
+  local branch=`git rev-parse --abbrev-ref HEAD`
+  [[ "$branch" == "master" ]] && echo "should be on feature branch" && return 1
+  git pull --rebase || return 1
+# squash your commits into sensible chunks
+  git rebase -i
+  git push origin HEAD:$branch -f || return 1
+  git push origin HEAD:master || return 1
+  git checkout master || return 1
+  git push origin :$branch || return 1
+  git branch -d $branch || return 1
+}
 
-#grelease() {
-  #local branch=`git rev-parse --abbrev-ref HEAD`
-  #[[ "$branch" == "master" ]] && echo "should be on feature branch" && return 1
-  #git pull --rebase || return 1
-  #git push origin HEAD:$branch -f || return 1
-  #git push origin HEAD:master || return 1
-  #git checkout master || return 1
-  #git push origin :$branch || return 1
-  #git branch -d $branch || return 1
-#}
 # Auto convert .... to ../..
 # zstyle ':prezto:module:editor' dot-expansion 'yes'
 
