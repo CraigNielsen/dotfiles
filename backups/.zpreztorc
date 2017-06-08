@@ -27,8 +27,9 @@ eval $(thefuck --alias f)
 fpath=(~/.zsh/completion $fpath)
 autoload -Uz compinit && compinit -i
 
-
+alias gitalias='vim $HOME/.zprezto/modules/git/alias.zsh'
 alias gst="git status"
+alias gp="git pull"
 
 #temps
 alias sock='cd ~/git_repos; pyenv activate data-science;python -m sockets.server.server'
