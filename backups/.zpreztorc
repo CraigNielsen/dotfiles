@@ -2,17 +2,18 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 alias vim=nvim
 alias v=vim .
+alias keys="vim $HOME/.vimkeys.vimrc"
 alias keys="vim $HOME/keys.vimrc"
 alias dc=docker-compose
-alias k="kubectl"
 alias n="nautilus"
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
+
+alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
 alias kc="kubectl create"
-alias keys="vim $HOME/.vimkeys.vimrc"
 alias kgp="kubectl get pods -owide --all-namespaces"
 alias kdd="kubectl delete deployment"
-alias minikubedocker='eval $(minikube docker-env)'
+alias md='eval $(minikube docker-env)'
 alias minikubedockerexit='eval $(minikube docker-env -u)'
 
 alias reload='exec $SHELL -l'
@@ -107,7 +108,7 @@ cd workspace/dev-environments/docker-environment/collections && source compose.e
 cd ~/workspace/dev-environments/docker-environment/collections/shared/wms-staging/
 }
 dev() {
-cd workspace/dev-environments/docker-environment/collections && source compose.env
+cd $HOME/workspace/dev-environments/docker-environment/collections && source compose.env
 cd ~/workspace/cdev/$1
 }
 devup() {
