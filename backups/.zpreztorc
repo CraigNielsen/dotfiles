@@ -11,11 +11,11 @@ alias mbs="cd $HOME/git_repos/mybondsite/backend;"
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
 alias kc="kubectl create"
-alias kgp="kubectl get pods -owide --all-namespaces"
+alias kgp="kubectl get pods -owide --all-namespaces --show-all"
 alias kdd="kubectl delete deployment"
 alias md='eval $(minikube docker-env)'
 alias minikubedockerexit='eval $(minikube docker-env -u)'
-
+alias minikuberestart='(minikube stop;  minikube start)'
 alias reload='exec $SHELL -l'
 alias pj='cd ~/git_repos/psychicjenha/frontend'
 alias tk='cd ~/workspace/dev-environments/kubernetes-environments'
@@ -33,10 +33,11 @@ alias gst="git status"
 alias gp="git pull"
 
 #temps
-alias sock='cd ~/git_repos; pyenv activate data-science;python -m sockets.server.server'
+alias sickd='cd ~/workspace/dev-environments/kubernetes-environments/environment/roles/s4f-sick-integration-service/'
 alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
 alias ss='cd ~/workspace/s4f-sick-integration-service/'
 #end temps
+#
 export PIP_REQUIRE_VIRTUALENV=true
 export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
 export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
@@ -70,6 +71,9 @@ envv() {
     else
       env | grep -i $1
   fi
+}
+kin () {
+  kubectl run -i --tty temp --image=$1 --restart=Never -- sh
 }
 restartn() {
   sudo service networking restart;
@@ -108,7 +112,6 @@ cd workspace/dev-environments/docker-environment/collections && source compose.e
 cd ~/workspace/dev-environments/docker-environment/collections/shared/wms-staging/
 }
 dev() {
-cd $HOME/workspace/dev-environments/docker-environment/collections && source compose.env
 cd ~/workspace/cdev/$1
 }
 devup() {
