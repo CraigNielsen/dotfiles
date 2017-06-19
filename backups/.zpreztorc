@@ -7,7 +7,7 @@ alias keys="vim $HOME/keys.vimrc"
 alias dc=docker-compose
 alias n="nautilus"
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
-alias kaf="cd $HOME/git_repos/kafga/code;"
+alias kaf="cd $HOME/git_repos/kafka/code;"
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
@@ -44,7 +44,7 @@ alias gogo='cd ~/git_repos/kafga/code && ./commands.py'
 export PIP_REQUIRE_VIRTUALENV=true
 export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
 export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
-export PATH=$PATH:/opt
+export PATH=$PATH:/opt/hub-linux-amd64-2.3.0-pre9/bin/
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 setopt correct
@@ -301,3 +301,4 @@ KCreate() {
 
 # Set the default session name:
 # zstyle ':prezto:module:tmux:session' name 'YOUR DEFAULT SESSION NAME'
+
