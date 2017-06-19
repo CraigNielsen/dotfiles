@@ -7,6 +7,7 @@ alias keys="vim $HOME/keys.vimrc"
 alias dc=docker-compose
 alias n="nautilus"
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
+alias kaf="cd $HOME/git_repos/kafga/code;"
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
@@ -31,11 +32,13 @@ autoload -Uz compinit && compinit -i
 alias gitalias='vim $HOME/.zprezto/modules/git/alias.zsh'
 alias gst="git status"
 alias gp="git pull"
+alias kafcreate='hello'
 
 #temps
 alias sickd='cd ~/workspace/dev-environments/kubernetes-environments/environment/roles/s4f-sick-integration-service/'
 alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
 alias ss='cd ~/workspace/s4f-sick-integration-service/'
+alias gogo='cd ~/git_repos/kafga/code && ./commands.py'
 #end temps
 #
 export PIP_REQUIRE_VIRTUALENV=true
@@ -157,6 +160,15 @@ grelease() {
   git checkout master || return 1
   git push origin :$branch || return 1
   git branch -d $branch || return 1
+}
+
+# function that will compose two other commands
+#kafka commands
+KRun() {
+  docker run --rm -it --net=host landoop/fast-data-dev bash -c -
+}
+KCreate() {
+  cat "kafka-topics --zookeeper 127.0.0.1:2181 --create --topic $1 --partitions 3 --replication-factor 1" | sed 's_$1_'$1'_' | KRun -
 }
 
 # Auto convert .... to ../..
