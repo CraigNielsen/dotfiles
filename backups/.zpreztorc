@@ -35,6 +35,7 @@ alias gp="git pull"
 alias kafcreate='hello'
 
 #temps
+alias es='cd ~/workspace/tal_big_data/reports/2017-06_grad_big_data/'
 alias sickd='cd ~/workspace/dev-environments/kubernetes-environments/environment/roles/s4f-sick-integration-service/'
 alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
 alias ss='cd ~/workspace/s4f-sick-integration-service/'
