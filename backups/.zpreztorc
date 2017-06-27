@@ -7,7 +7,11 @@ alias keys="vim $HOME/keys.vimrc"
 alias dc=docker-compose
 alias n="nautilus"
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
+<<<<<<< HEAD
+alias kaf="cd $HOME/git_repos/kafka/code;"
+=======
 alias kaf="cd $HOME/git_repos/kafga/code;"
+>>>>>>> 0afbdfcce6dfaa6fe5c0761f2af8d791294588ad
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
@@ -35,7 +39,14 @@ alias gp="git pull"
 alias kafcreate='hello'
 
 #temps
+<<<<<<< HEAD
 alias ipyvim='pyenv activate neovim3; ipython kernel; watch'
+=======
+<<<<<<< HEAD
+alias ipyvim='pyenv activate neovim3; ipython kernel; watch'
+=======
+>>>>>>> 0afbdfcce6dfaa6fe5c0761f2af8d791294588ad
+>>>>>>> 6801ed990d82adc1806df13a81e55c05f62be3f7
 alias es='cd ~/workspace/tal_big_data/reports/2017-06_grad_big_data/'
 alias sickd='cd ~/workspace/dev-environments/kubernetes-environments/environment/roles/s4f-sick-integration-service/'
 alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
