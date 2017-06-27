@@ -35,6 +35,7 @@ alias gp="git pull"
 alias kafcreate='hello'
 
 #temps
+alias ipyvim='pyenv activate neovim3; ipython kernel; watch'
 alias es='cd ~/workspace/tal_big_data/reports/2017-06_grad_big_data/'
 alias sickd='cd ~/workspace/dev-environments/kubernetes-environments/environment/roles/s4f-sick-integration-service/'
 alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
@@ -45,7 +46,7 @@ alias gogo='cd ~/git_repos/kafga/code && ./commands.py'
 export PIP_REQUIRE_VIRTUALENV=true
 export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
 export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
-export PATH=$PATH:/opt
+export PATH=$PATH:/opt/hub-linux-amd64-2.3.0-pre9/bin/
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 setopt correct
@@ -67,6 +68,11 @@ zstyle ':prezto:load' pmodule \
 zstyle ':prezto:module:prompt' theme 'agnoster'
 savehelp() {
   echo "$@[2,-1]" >> $HOME/git_repos/craig_help/$1
+}
+gc() {
+  git add .
+  echo hello
+  git commit -m "{$@}"
 }
 envv() {
   if [[ $# -eq 0 ]]
@@ -118,6 +124,7 @@ cd ~/workspace/dev-environments/docker-environment/collections/shared/wms-stagin
 dev() {
 cd ~/workspace/cdev/$1
 }
+
 devup() {
 cd ~/workspace/dev-environments/docker-environment/collections && source compose.env
 cd ~/workspace/cdev/$1
@@ -302,3 +309,4 @@ KCreate() {
 
 # Set the default session name:
 # zstyle ':prezto:module:tmux:session' name 'YOUR DEFAULT SESSION NAME'
+
