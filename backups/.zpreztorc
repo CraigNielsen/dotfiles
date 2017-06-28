@@ -1,17 +1,22 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
+#
+export KUBE_UAT_NAMESPACE="wmsuat"
+export KUBE_CRAIG_NAMESPACE="craig"
+export CKCOMMAND="kubectl --context kubernetes-admin@kubernetes --namespace $KUBE_CRAIG_NAMESPACE"
+
 alias vim=nvim
 alias v=vim .
 alias keys="vim $HOME/.vimkeys.vimrc"
 alias keys="vim $HOME/keys.vimrc"
+alias plug="vim $HOME/plug.vimrc"
 alias dc=docker-compose
 alias n="nautilus"
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
-<<<<<<< HEAD
-alias kaf="cd $HOME/git_repos/kafka/code;"
-=======
 alias kaf="cd $HOME/git_repos/kafga/code;"
->>>>>>> 0afbdfcce6dfaa6fe5c0761f2af8d791294588ad
+alias officek='kubectl --context kubernetes-admin@kubernetes'
+alias officetesting="kubectl --context kubernetes-admin@kubernetes --namespace $KUBE_UAT_NAMESPACE"
+alias ck="kubectl --context kubernetes-admin@kubernetes --namespace $KUBE_CRAIG_NAMESPACE"
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
@@ -39,10 +44,7 @@ alias gp="git pull"
 alias kafcreate='hello'
 
 #temps
-<<<<<<< HEAD
 alias ipyvim='pyenv activate neovim3; ipython kernel; watch'
-=======
->>>>>>> 0afbdfcce6dfaa6fe5c0761f2af8d791294588ad
 alias es='cd ~/workspace/tal_big_data/reports/2017-06_grad_big_data/'
 alias sickd='cd ~/workspace/dev-environments/kubernetes-environments/environment/roles/s4f-sick-integration-service/'
 alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
