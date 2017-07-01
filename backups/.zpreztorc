@@ -3,7 +3,12 @@
 #
 export KUBE_UAT_NAMESPACE="wmsuat"
 export KUBE_CRAIG_NAMESPACE="craig"
-export CKCOMMAND="kubectl --context kubernetes-admin@kubernetes --namespace $KUBE_CRAIG_NAMESPACE"
+export CK="kubectl --context kubernetes-admin@kubernetes --namespace $KUBE_CRAIG_NAMESPACE"
+export OFFICETESTING="kubectl --context kubernetes-admin@kubernetes --namespace $KUBE_UAT_NAMESPACE"
+export PIP_REQUIRE_VIRTUALENV=true
+export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
+export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
+export PATH=$PATH:/opt/hub-linux-amd64-2.3.0-pre9/bin/
 
 alias vim=nvim
 alias v=vim .
@@ -14,9 +19,36 @@ alias dc=docker-compose
 alias n="nautilus"
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
 alias kaf="cd $HOME/git_repos/kafga/code;"
-alias officek='kubectl --context kubernetes-admin@kubernetes'
-alias officetesting="kubectl --context kubernetes-admin@kubernetes --namespace $KUBE_UAT_NAMESPACE"
-alias ck="kubectl --context kubernetes-admin@kubernetes --namespace $KUBE_CRAIG_NAMESPACE"
+#alias officek='kubectl --context kubernetes-admin@kubernetes'
+alias ck="$CK"
+alias officetesting="$OFFICETESTING"
+
+#watching kubes
+alias watch1="$HOME/workspace/cdev/kube/watch_kube.py kubectl"
+alias watch2="$HOME/workspace/cdev/kube/watch_kube.py '$CK'"
+alias watch3="$HOME/workspace/cdev/kube/watch_kube.py '$OFFICETESTING'"
+
+#temp create delete for kcs:
+alias c1wms="kubectl create -f $TA/wms-service"
+alias d1wms="kubectl delete -f $TA/wms-service"
+alias c1dims="kubectl create -f $TA/s4f-dimension-processor-service/"
+alias d1dims="kubectl delete -f $TA/s4f-dimension-processor-service/"
+alias c1sftp="kubectl create -f $TA/sftp/"
+alias d1sftp="kubectl delete -f $TA/sftp/"
+
+alias c2wms="$CK create -f $TA/wms-service"
+alias d2wms="$CK delete -f $TA/wms-service"
+alias c2dims="$CK create -f $TA/s4f-dimension-processor-service/"
+alias d2dims="$CK delete -f $TA/s4f-dimension-processor-service/"
+alias c2sftp="$CK create -f $TA/sftp/"
+alias d2sftp="$CK delete -f $TA/sftp/"
+
+alias c3wms="$OFFICETESTING create -f $TA/wms-service"
+alias d3wms="$OFFICETESTING delete -f $TA/wms-service"
+alias c3dims="$OFFICETESTING create -f $TA/s4f-dimension-processor-service/"
+alias d3dims="$OFFICETESTING delete -f $TA/s4f-dimension-processor-service/"
+alias c3sftp="$OFFICETESTING create -f $TA/sftp/"
+alias d3sftp="$OFFICETESTING delete -f $TA/sftp/"
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
@@ -49,13 +81,10 @@ alias es='cd ~/workspace/tal_big_data/reports/2017-06_grad_big_data/'
 alias sickd='cd ~/workspace/dev-environments/kubernetes-environments/environment/roles/s4f-sick-integration-service/'
 alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
 alias ss='cd ~/workspace/s4f-sick-integration-service/'
-alias gogo='cd ~/git_repos/kafga/code && ./commands.py'
+alias gogo='cd $HOME/git_repos/kafka/code && ./tal-commands.py'
+alias prod="cd ~/workspace/s4f-dimension-processor/dimension_processor"
 #end temps
 #
-export PIP_REQUIRE_VIRTUALENV=true
-export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
-export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
-export PATH=$PATH:/opt/hub-linux-amd64-2.3.0-pre9/bin/
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 setopt correct
@@ -74,7 +103,7 @@ zstyle ':prezto:load' pmodule \
          'syntax-highlighting' \
          'history-substring-search' \
          'prompt'
-zstyle ':prezto:module:prompt' theme 'agnoster'
+zstyle ':prezto:module:prompt' theme 'smiley'
 savehelp() {
   echo "$@[2,-1]" >> $HOME/git_repos/craig_help/$1
 }
@@ -157,7 +186,10 @@ gpush() {
 }
 gpr() {
   local branch=`git rev-parse --abbrev-ref HEAD`
+#check tracking master
+  #set following master
   [[ "$branch" == "master" ]] && echo "should be on feature branch" && return 1
+git branch --set-upstream-to=origin/master branch
   git push origin HEAD:$branch || return 1
   hub pull-request -h $branch
 }
