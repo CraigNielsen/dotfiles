@@ -3,14 +3,16 @@
 #
 export KUBE_UAT_NAMESPACE="wmstesting"
 export KUBE_CRAIG_NAMESPACE="craig"
-export CK="kubectl --context kubernetes-admin@kubernetes --namespace $KUBE_CRAIG_NAMESPACE"
-export OFFICETESTING="kubectl --context kubernetes-admin@kubernetes --namespace $KUBE_UAT_NAMESPACE"
-export master="kubectl --context kubernetes-admin@kubernetes --namespace master"
+export OFFICE="kubectl --context kubernetes-admin@kubernetes"
+export UAT="$OFFICE --namespace wmsuat"
+export CK="$OFFICE --namespace $KUBE_CRAIG_NAMESPACE"
+export OFFICETESTING="$OFFICE --namespace $KUBE_UAT_NAMESPACE"
 export PIP_REQUIRE_VIRTUALENV=true
 export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
 export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
+export CP=$HOME/workspace/cdev/kube/deployments
 export PATH=$PATH:/opt/hub-linux-amd64-2.3.0-pre9/bin/
-export PATH=$PATH:/opt/diffconflicts
+export PATH=$PATH:/opt/bin/
 export PATCH=/home/craig/workspace/cdev/kube/patch.sh
 
 alias branchinfo="cat $HOME/workspace/cdev/branches_reference"
@@ -24,11 +26,13 @@ alias plug="vim $HOME/plug.vimrc"
 alias dc=docker-compose
 alias n="nautilus"
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
-alias kaf="cd $HOME/git_repos/kafga/code;"
+#
 #alias officek='kubectl --context kubernetes-admin@kubernetes'
 alias ck="$CK"
 alias officetesting="$OFFICETESTING"
 alias ke="kubectl exec -i -t"
+alias office="$OFFICE"
+alias uat="$UAT"
 
 #watching kubes
 alias watch1="$HOME/workspace/cdev/kube/watch_kube.py kubectl"
@@ -67,16 +71,33 @@ alias d3sftp="$OFFICETESTING delete -f $TA/sftp/"
 
 #execute e temp
 alias e1wms="kubectl run c-wms-shell --rm -i --tty --image 10.4.1.39:5000/takealot/tal-with-requirements -- bash"
-alias e1dims="kubectl run c-dims-shell --rm -i --tty --image 10.4.1.39:5000/takealot/s4f-dimension-processor:master -- bash"
+#alias e1dims="kubectl run c-dims-shell --rm -i --tty --image 10.4.1.39:5000/takealot/s4f-dimension-processor:master -- bash"
+
+#DEBUGGING DIMS
+alias dec1dimssftp="kubectl create -f $CP/sftp-dimensions-consumer.yaml"
+alias ded1dimssftp="kubectl delete -f $CP/sftp-dimensions-consumer.yaml"
+alias dec1dimswmsapi="kubectl create -f $CP/wmsapi-dimensions-consumer.yaml"
+alias ded1dimswmsapi="kubectl delete -f $CP/wmsapi-dimensions-consumer.yaml"
+dee1dimssftp() {
+  kubectl exec -i -t $1 -- bash -c "kafka_consumer --consumer_type tsin_dimensions_sftp"
+}
+dee1dimswmsapi() {
+  kubectl exec -i -t $1 -- bash -c "kafka_consumer --consumer_type tsin_dimensions_wmsapi"
+}
 alias e1dims2166="kubectl run c-dims-shell --rm -i --tty --image 10.4.1.39:5000/takealot/warehouse_pack:master -- bash"
 
+#
 #patch
 alias p1adap="$PATCH $TP/adaptris-deployment.yaml"
-alias p1dims="$PATCH $TP/s4f-dimension-processor/warehouse-tsin-dimensions-sftp-consumer-deployment.yaml"
+p1dims() {
+  $PATCH $TP/s4f-dimension-processor/warehouse-tsin-dimensions-sftp-consumer-deployment.yaml
+  $PATCH $TP/s4f-dimension-processor/warehouse-tsin-dimensions-wmsapi-consumerdeployment.yaml
+}
 #
 #view v
 alias vwms="cd $HOME/workspace/tal/tal/services/wms/"
 alias vadap="cd $HOME/workspace/tal/tal/services/adaptris/"
+alias kaf="cd $HOME/git_repos/kafka/code;"
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
@@ -84,7 +105,6 @@ alias kc="kubectl create"
 alias kgp="kubectl get pods -owide --all-namespaces --show-all"
 alias kdd="kubectl delete deployment"
 alias minikubedockerexit='eval $(minikube docker-env -u)'
-alias minikuberestart='(minikube stop;  minikube start)'
 alias reload='exec $SHELL -l'
 alias pj='cd ~/git_repos/psychicjenha/frontend'
 alias tk='cd ~/workspace/dev-environments/kubernetes-environments'
@@ -136,6 +156,29 @@ zstyle ':prezto:module:prompt' theme 'smiley'
 savehelp() {
   echo "$@[2,-1]" >> $HOME/git_repos/craig_help/$1
 }
+pushtalbranchImage() {
+  # get the git branch name
+  cd $HOME/workspace/tal/
+  export BRANCH=`git rev-parse --abbrev-ref HEAD`
+
+  # build the container
+  export IMAGE_PATH="10.4.1.39:5000/takealot/tal-with-requirements:${BRANCH}"
+  docker build -t ${IMAGE_PATH} -f Dockerfile .
+  docker push ${IMAGE_PATH}
+}
+krun() {
+  k run my-shell --rm -i --tty --image 10.4.1.39:5000/takealot/warehouse_pack:master -- bash -c " pip install pudb;export ROLE=KUBERNETES;export ENVIRONMENT=STAGING; kafka_consumer --consumer_type tsin_dimensions_sftp
+"
+}
+krun2() {
+  k exec -i --tty $1 -- bash -c "kafka_consumer --consumer_type tsin_dimensions_sftp
+"
+}
+gc() {
+  git add .
+  echo hello
+  git commit -m "{$@}"
+}
 envv() {
   if [[ $# -eq 0 ]]
     then
@@ -163,6 +206,11 @@ pullta() {
   fi
 }
 
+TESTD() {
+  NAME=$(kubectl get pod -o name | grep dimensions | sed 's/pods\///')
+  kubectl exec  $NAME -- bash -c "pip install pytest pudb unittest2 mock"
+  kubectl exec -i -t $NAME -- bash -c "cd dimension_processor/tests;pytest -s -x --lf test_dimension_processor.py"
+}
 TESTA() {
   $PATCH $TP/adaptris-deployment.yaml
   kubectl exec  $1 -- bash -c "pip install pytest pudb unittest2"
