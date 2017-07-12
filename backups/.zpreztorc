@@ -1,6 +1,7 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 #
+export CURRENTPROJECT="$HOME/workspace/tal/tal/services/mrd_integration/"
 export KUBE_UAT_NAMESPACE="wmstesting"
 export KUBE_CRAIG_NAMESPACE="craig"
 export OFFICE="kubectl --context kubernetes-admin@kubernetes"
@@ -36,7 +37,15 @@ alias uat="$UAT"
 
 #watching kubes
 alias watch1="$HOME/workspace/cdev/kube/watch_kube.py kubectl"
-alias watch2="$HOME/workspace/cdev/kube/watch_kube.py '$CK'"
+#alias watch2="$HOME/workspace/cdev/kube/watch_kube.py '$CK'"
+
+watch2() {
+  lsftp=$(kubectl get pod -o name | grep tsin-dimensions-sftp | sed 's/pods\///')
+  sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
+  poller=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep cub-poller | sed 's/pods\///')
+  $HOME/workspace/cdev/kube/watch_logs.py kubectl $lsftp $OFFICETESTING $sftp $poller
+}
+
 alias watch3="$HOME/workspace/cdev/kube/watch_kube.py '$OFFICETESTING'"
 
 #run interactive
@@ -96,7 +105,7 @@ p1dims() {
 #
 #view v
 alias vwms="cd $HOME/workspace/tal/tal/services/wms/"
-alias vadap="cd $HOME/workspace/tal/tal/services/adaptris/"
+alias vadap="cd $HOME/workspace/tal/tal/services/adaptris/;vim ."
 alias kaf="cd $HOME/git_repos/kafka/code;"
 
 alias k="kubectl"
@@ -131,7 +140,7 @@ alias sickd='cd ~/workspace/dev-environments/kubernetes-environments/environment
 alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
 alias ss='cd ~/workspace/s4f-sick-integration-service/'
 alias gogo='cd $HOME/git_repos/kafka/code && ./tal-commands.py'
-alias prod="cd ~/workspace/s4f-dimension-processor/dimension_processor"
+alias prod="$CURRENTPROJECT;vim ."
 #end temps
 #
 eval "$(pyenv init -)"
@@ -160,7 +169,7 @@ pushtalbranchImage() {
   # get the git branch name
   cd $HOME/workspace/tal/
   export BRANCH=`git rev-parse --abbrev-ref HEAD`
-
+  echo 'working on branch '$BRANCH
   # build the container
   export IMAGE_PATH="10.4.1.39:5000/takealot/tal-with-requirements:${BRANCH}"
   docker build -t ${IMAGE_PATH} -f Dockerfile .
@@ -210,6 +219,17 @@ TESTD() {
   NAME=$(kubectl get pod -o name | grep dimensions | sed 's/pods\///')
   kubectl exec  $NAME -- bash -c "pip install pytest pudb unittest2 mock"
   kubectl exec -i -t $NAME -- bash -c "cd dimension_processor/tests;pytest -s -x --lf test_dimension_processor.py"
+}
+TESTMR() {
+  #run deployment in minikube
+  NAME=$(kubectl get pod -o name | grep mrd | sed 's/pods\///')
+  kubectl exec  $NAME -- bash -c "pip install pytest pudb unittest2 mock"
+  #run tests
+  kubectl exec  $NAME -- bash -c "pytest services/tests/test_split_shipments.py"
+
+  #expose pod
+  #
+  #curl endpoint with some data
 }
 TESTA() {
   $PATCH $TP/adaptris-deployment.yaml
