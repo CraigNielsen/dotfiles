@@ -4,20 +4,18 @@ alias vim=nvim
 alias v=vim .
 alias keys="vim $HOME/.vimkeys.vimrc"
 alias keys="vim $HOME/keys.vimrc"
+alias plug="vim $HOME/plug.vimrc"
 alias dc=docker-compose
 alias n="nautilus"
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
 alias kaf="cd $HOME/git_repos/kafka/code;"
-alias kaf="cd $HOME/git_repos/kafga/code;"
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
 alias kc="kubectl create"
 alias kgp="kubectl get pods -owide --all-namespaces --show-all"
 alias kdd="kubectl delete deployment"
-alias md='eval $(minikube docker-env)'
 alias minikubedockerexit='eval $(minikube docker-env -u)'
-alias minikuberestart='(minikube stop;  minikube start)'
 alias reload='exec $SHELL -l'
 alias pj='cd ~/git_repos/psychicjenha/frontend'
 alias tk='cd ~/workspace/dev-environments/kubernetes-environments'
@@ -34,22 +32,20 @@ alias gitalias='vim $HOME/.zprezto/modules/git/alias.zsh'
 alias gst="git status"
 alias gp="git pull"
 alias kafcreate='hello'
+#patches to k8s
+alias p1wms='$HOME/workspace/cdev/kube/patch.sh $TP/wms-deployment.yaml'
 
 #temps
-alias ipyvim='pyenv activate neovim3; ipython kernel; watch'
 alias ipyvim='pyenv activate neovim3; ipython kernel; watch'
 alias es='cd ~/workspace/tal_big_data/reports/2017-06_grad_big_data/'
 alias sickd='cd ~/workspace/dev-environments/kubernetes-environments/environment/roles/s4f-sick-integration-service/'
 alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
 alias ss='cd ~/workspace/s4f-sick-integration-service/'
-alias gogo='cd ~/git_repos/kafga/code && ./commands.py'
-alias test='echo'
+alias gogo='cd $HOME/git_repos/kafka/code && ./tal-commands.py'
+alias prod="$CURRENTPROJECT;vim ."
 #end temps
 #
-export PIP_REQUIRE_VIRTUALENV=true
-export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
-export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
-export PATH=$PATH:/opt/hub-linux-amd64-2.3.0-pre9/bin/
+#
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 setopt correct
@@ -68,14 +64,43 @@ zstyle ':prezto:load' pmodule \
          'syntax-highlighting' \
          'history-substring-search' \
          'prompt'
-zstyle ':prezto:module:prompt' theme 'agnoster'
+zstyle ':prezto:module:prompt' theme 'smiley'
 savehelp() {
   echo "$@[2,-1]" >> $HOME/git_repos/craig_help/$1
 }
-gc() {
+pushtalbranchImage() {
+  # get the git branch name
+  cd $HOME/workspace/tal/
+  export BRANCH=`git rev-parse --abbrev-ref HEAD`
+  echo 'working on branch '$BRANCH
+  # build the container
+  export IMAGE_PATH="10.4.1.39:5000/takealot/tal-with-requirements:${BRANCH}"
+  docker build -t ${IMAGE_PATH} -f Dockerfile .
+  docker push ${IMAGE_PATH}
+}
+krun() {
+  k run my-shell --rm -i --tty --image 10.4.1.39:5000/takealot/warehouse_pack:master -- bash -c " pip install pudb;export ROLE=KUBERNETES;export ENVIRONMENT=STAGING; kafka_consumer --consumer_type tsin_dimensions_sftp
+"
+}
+krun2() {
+  k exec -i --tty $1 -- bash -c "kafka_consumer --consumer_type tsin_dimensions_sftp
+"
+}
+gac() {
   git add .
-  echo hello
   git commit -m "{$@}"
+}
+ghist() {
+	git log --oneline --graph --decorate --all
+}
+gc() {
+  if [[ $1 -eq master ]]
+    then
+      git checkout master
+    else
+      git checkout WMS-"$@"
+  fi
+
 }
 envv() {
   if [[ $# -eq 0 ]]
@@ -104,6 +129,33 @@ pullta() {
   fi
 }
 
+TESTD() {
+  NAME=$(kubectl get pod -o name | grep dimensions | sed 's/pods\///')
+  kubectl exec  $NAME -- bash -c "pip install pytest pudb unittest2 mock"
+  kubectl exec -i -t $NAME -- bash -c "cd dimension_processor/tests;pytest -s -x --lf test_dimension_processor.py"
+}
+TESTMR() {
+  #run deployment in minikube
+  NAME=$(kubectl get pod -o name | grep mrd | sed 's/pods\///')
+  kubectl exec  $NAME -- bash -c "pip install pytest pudb unittest2 mock"
+  #run tests
+  kubectl exec  $NAME -- bash -c "pytest services/tests/test_split_shipments.py"
+
+  #expose pod
+  #
+  #curl endpoint with some data
+}
+TESTA() {
+  $PATCH $TP/adaptris-deployment.yaml
+  kubectl exec  $1 -- bash -c "pip install pytest pudb unittest2"
+  kubectl exec -i -t $1 -- bash -c "cd tal/services/adaptris/test;pytest -s -x --lf test_adaptris_integration.py"
+}
+PROD() {
+  cd $HOME/workspace/s4f-dimension-processor/dimension_processor
+  gnome-terminal -e "bash -c './home/craig/workspace/cdev/patch.sh /home/craig/workspace/dev-environments/kubernetes-environments/environment/patches/development/s4f-dimension-processor/warehouse-tsin-dimensions-sftp-consumer-767482075-3qrz4'"
+  kubectl exec  $1 -- bash -c "pip install pytest pudb unittest2"
+  kubectl exec -i -t $1 -- bash -c "cd dimension_processor;pytest -x --lf -s tests/test_dimension_processor.py"
+}
 checkta() {
   for foldr in ~/workspace/*/;
     do
@@ -112,6 +164,12 @@ checkta() {
       git fetch;
       pullta
     done;
+}
+
+md() {
+  eval $(minikube docker-env)
+  minikube ssh "echo 'Domains=stagealot.com' | sudo tee -a /etc/systemd/resolved.conf"
+  minikube ssh "sudo systemctl restart systemd-resolved.service"
 }
 
 dcc() {
@@ -147,7 +205,10 @@ dc exec adaptris bash -c 'cd tal/services/adaptris/test; ptw -- -x --lf;';
 code-on() {
   git checkout -b $1 origin/master
 }
-
+jumpbox() {
+  ssh-add
+  ssh -A craigferguson@jump-box.takealot.com
+}
 
 gpush() {
   local branch=`git rev-parse --abbrev-ref HEAD`
@@ -156,7 +217,10 @@ gpush() {
 }
 gpr() {
   local branch=`git rev-parse --abbrev-ref HEAD`
+#check tracking master
+  #set following master
   [[ "$branch" == "master" ]] && echo "should be on feature branch" && return 1
+git branch --set-upstream-to=origin/master branch
   git push origin HEAD:$branch || return 1
   hub pull-request -h $branch
 }
