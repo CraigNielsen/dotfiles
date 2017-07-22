@@ -43,6 +43,7 @@ alias sickd='cd ~/workspace/dev-environments/kubernetes-environments/environment
 alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
 alias ss='cd ~/workspace/s4f-sick-integration-service/'
 alias gogo='cd ~/git_repos/kafga/code && ./commands.py'
+alias test='echo'
 #end temps
 #
 export PIP_REQUIRE_VIRTUALENV=true
