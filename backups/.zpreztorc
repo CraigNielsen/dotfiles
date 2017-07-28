@@ -8,7 +8,7 @@ export KUBE_CRAIG_NAMESPACE="craig"
 export OFFICE="kubectl --context kubernetes-admin@kubernetes"
 export UAT="$OFFICE --namespace wmsuat"
 export CK="$OFFICE --namespace $KUBE_CRAIG_NAMESPACE"
-export OFFICETESTING="$OFFICE --namespace $KUBE_UAT_NAMESPACE"
+export WMSTESTING="$OFFICE --namespace $KUBE_UAT_NAMESPACE"
 export MASTER="$OFFICE --namespace master"
 export PIP_REQUIRE_VIRTUALENV=true
 export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
@@ -32,11 +32,11 @@ alias mbs="cd $HOME/git_repos/mybondsite/backend;"
 #
 #alias officek='kubectl --context kubernetes-admin@kubernetes'
 alias ck="$CK"
-alias wmstesting="$OFFICETESTING"
+alias wmstesting="$WMSTESTING"
 alias ke="kubectl exec -i -t"
 alias ka="kubectl attach -i -t"
 alias office="$OFFICE"
-alias uat="$UAT"
+alias wmsuat="$UAT"
 alias master="$MASTER"
 
 #watch network
@@ -46,44 +46,58 @@ alias watchnet="watch -n 1 'sudo netstat -tanop'"
 alias watch1="$HOME/workspace/cdev/kube/watch_kube.py kubectl"
 #alias watch2="$HOME/workspace/cdev/kube/watch_kube.py '$CK'"
 
-watch2() {
-  lsftp=$(kubectl get pod -o name | grep tsin-dimensions-sftp | sed 's/pods\///')
-  sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
-  poller=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep cub-poller | sed 's/pods\///')
-  if [[ -z $lsftp ]]
-    then
-    echo 'please make sure local tsin-dims sftp consumer is running'
-  fi
-  if [[ -z $sftp ]]
-    then
-    echo 'please make sure sftp is running in uat namespace : wmstesting'
-  fi
-  if [[ -z $poller ]]
-    then
-    echo 'please make sure cub poller is running in uat namespace'
-  fi
-  $HOME/workspace/cdev/kube/watch_logs.py kubectl $lsftp $OFFICETESTING $sftp $poller
+alias pods_wmstesting="watch -n 1 'kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pods'"
+
+watch_wmstesting() {
+  #sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
+
+  # give sftp in wmstesting so can copy files
+  #$HOME/workspace/cdev/kube/watch_pods.py $WMSTESTING $sftp
+
+  # watch logs for testing namespace tsin specific
+  $HOME/workspace/cdev/kube/sterntsinconsumers.py wmstesting
+}
+watch_mini() {
+  $HOME/workspace/cdev/kube/stern_local.py
+  $HOME/workspace/cdev/kube/watch_pods.py kubectl
+  exit
 }
 
 watch3() {
-  lsftp=$(kubectl get pod -o name | grep tsin-dimensions-sftp | sed 's/pods\///')
+  #lsftp=$(kubectl get pod -o name | grep tsin-dimensions-sftp | sed 's/pods\///')
   sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmsuat get pod -o name | grep sftp-wms | sed 's/pods\///')
-  poller=$(kubectl --context kubernetes-admin@kubernetes --namespace wmsuat get pod -o name | grep cub-poller | sed 's/pods\///')
-  if [[ -z $lsftp ]]
-    then
-    echo 'please make sure local tsin-dims sftp consumer is running'
-  fi
-  if [[ -z $sftp ]]
-    then
-    echo 'please make sure sftp is running in uat namespace : wmstesting'
-  fi
-  if [[ -z $poller ]]
-    then
-    echo 'please make sure cub poller is running in uat namespace'
-  fi
-  $HOME/workspace/cdev/kube/watch_logs.py kubectl $lsftp $UAT $sftp $poller
+  #poller=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep cub-poller | sed 's/pods\///')
+  #if [[ -z $lsftp ]]
+    #then
+    #echo 'please make sure local tsin-dims sftp consumer is running'
+  #fi
+  #if [[ -z $sftp ]]
+    #then
+    #echo 'please make sure sftp is running in uat namespace : wmstesting'
+  #fi
+  #if [[ -z $poller ]]
+    #then
+    #echo 'please make sure cub poller is running in uat namespace'
+  #fi
+  $HOME/workspace/cdev/kube/watch_pods.py $UAT $sftp
+# pass in namespace as first arg
+  $HOME/workspace/cdev/kube/sterntsinconsumers.py wmsuat
 }
+start_code() {
+  nohup hipchat4 &
+  nohup chromium --new-window https://calendar.google.com/calendar/render
+}
+add_sftp_file(){
+  #sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
+  #wmstesting exec -i -t $sftp -- bash -c "cp /tmp/CUB_TEST_001 /home/wms/data/TAL/CPT/output/$1"
 
+  sshpass -e sftp -oBatchMode=no -b - takealot_uat_if@uatsftp.logfireapps.com
+#sshpass -e sftp -oBatchMode=no -b - sftp-user@remote-host << !
+   #cd incoming
+   #put your-log-file.log
+   #bye
+#!
+}
 
 #run interactive
 alias r1wms="kubectl run wms-service -i --tty --image 10.4.1.39:5000/takealot/tal-with-requirements:master --env='ROLE=KUBERNETES' -- bash -c '/usr/local/tal/tal/bin/gunicorn-docker-entry.sh \"tal.services.wms.server:application\"'"
@@ -108,12 +122,12 @@ alias d2dims="$CK delete -f $TA/s4f-dimension-processor-service/"
 alias c2sftp="$CK create -f $TA/sftp/"
 alias d2sftp="$CK delete -f $TA/sftp/"
 
-alias c3wms="$OFFICETESTING create -f $TA/wms-service"
-alias d3wms="$OFFICETESTING delete -f $TA/wms-service"
-alias c3dims="$OFFICETESTING create -f $TA/s4f-dimension-processor-service/"
-alias d3dims="$OFFICETESTING delete -f $TA/s4f-dimension-processor-service/"
-alias c3sftp="$OFFICETESTING create -f $TA/sftp/"
-alias d3sftp="$OFFICETESTING delete -f $TA/sftp/"
+alias c3wms="$WMSTESTING create -f $TA/wms-service"
+alias d3wms="$WMSTESTING delete -f $TA/wms-service"
+alias c3dims="$WMSTESTING create -f $TA/s4f-dimension-processor-service/"
+alias d3dims="$WMSTESTING delete -f $TA/s4f-dimension-processor-service/"
+alias c3sftp="$WMSTESTING create -f $TA/sftp/"
+alias d3sftp="$WMSTESTING delete -f $TA/sftp/"
 
 #execute e temp
 alias e1wms="kubectl run c-wms-shell --rm -i --tty --image 10.4.1.39:5000/takealot/tal-with-requirements -- bash"
