@@ -1,5 +1,7 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
+#
+export PATH="/home/craig/anaconda3/bin:$PATH"
 alias vim=nvim
 alias v=vim .
 alias keys="vim $HOME/.vimkeys.vimrc"
@@ -376,4 +378,3 @@ KCreate() {
 
 # Set the default session name:
 # zstyle ':prezto:module:tmux:session' name 'YOUR DEFAULT SESSION NAME'
-
