@@ -1,7 +1,30 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 #
+<<<<<<< HEAD
 export PATH="/home/craig/anaconda3/bin:$PATH"
+=======
+export CURRENTPROJECT="$HOME/workspace/tal/tal/services/mrd_integration/"
+export STERN='stern --context kubernetes-admin@kubernetes'
+export KUBE_UAT_NAMESPACE="wmstesting"
+export KUBE_CRAIG_NAMESPACE="craig"
+export OFFICE="kubectl --context kubernetes-admin@kubernetes"
+export UAT="$OFFICE --namespace wmsuat"
+export CK="$OFFICE --namespace $KUBE_CRAIG_NAMESPACE"
+export WMSTESTING="$OFFICE --namespace $KUBE_UAT_NAMESPACE"
+export MASTER="$OFFICE --namespace master"
+export PIP_REQUIRE_VIRTUALENV=true
+export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
+export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
+export CP=$HOME/workspace/cdev/kube/deployments
+export PATH=$PATH:/opt/hub-linux-amd64-2.3.0-pre9/bin/
+export PATH=$PATH:/opt/bin/
+export PATCH=/home/craig/workspace/cdev/kube/patch.sh
+
+alias branchinfo="cat $HOME/workspace/cdev/branches_reference"
+alias branchinfoedit="vim $HOME/workspace/cdev/branches_reference"
+
+>>>>>>> a17627644879fd4c7bed0af7c13717f09b7be455
 alias vim=nvim
 alias v=vim .
 alias keys="vim $HOME/.vimkeys.vimrc"
@@ -10,6 +33,137 @@ alias plug="vim $HOME/plug.vimrc"
 alias dc=docker-compose
 alias n="nautilus"
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
+#
+#alias officek='kubectl --context kubernetes-admin@kubernetes'
+alias ck="$CK"
+alias wmstesting="$WMSTESTING"
+alias ke="kubectl exec -i -t"
+alias ka="kubectl attach -i -t"
+alias office="$OFFICE"
+alias wmsuat="$UAT"
+alias master="$MASTER"
+
+#watch network
+alias watchnet="watch -n 1 'sudo netstat -tanop'"
+
+#watching kubes
+alias watch1="$HOME/workspace/cdev/kube/watch_kube.py kubectl"
+#alias watch2="$HOME/workspace/cdev/kube/watch_kube.py '$CK'"
+
+alias pods_wmstesting="watch -n 1 'kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pods'"
+
+watch_wmstesting() {
+  #sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
+
+  # give sftp in wmstesting so can copy files
+  #$HOME/workspace/cdev/kube/watch_pods.py $WMSTESTING $sftp
+
+  # watch logs for testing namespace tsin specific
+  $HOME/workspace/cdev/kube/sterntsinconsumers.py wmstesting
+}
+watch_mini() {
+  $HOME/workspace/cdev/kube/stern_local.py
+  $HOME/workspace/cdev/kube/watch_pods.py kubectl
+  exit
+}
+
+watch3() {
+  #lsftp=$(kubectl get pod -o name | grep tsin-dimensions-sftp | sed 's/pods\///')
+  sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmsuat get pod -o name | grep sftp-wms | sed 's/pods\///')
+  #poller=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep cub-poller | sed 's/pods\///')
+  #if [[ -z $lsftp ]]
+    #then
+    #echo 'please make sure local tsin-dims sftp consumer is running'
+  #fi
+  #if [[ -z $sftp ]]
+    #then
+    #echo 'please make sure sftp is running in uat namespace : wmstesting'
+  #fi
+  #if [[ -z $poller ]]
+    #then
+    #echo 'please make sure cub poller is running in uat namespace'
+  #fi
+  $HOME/workspace/cdev/kube/watch_pods.py $UAT $sftp
+# pass in namespace as first arg
+  $HOME/workspace/cdev/kube/sterntsinconsumers.py wmsuat
+}
+start_code() {
+  nohup hipchat4 &
+  nohup chromium --new-window https://calendar.google.com/calendar/render
+}
+add_sftp_file(){
+  #sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
+  #wmstesting exec -i -t $sftp -- bash -c "cp /tmp/CUB_TEST_001 /home/wms/data/TAL/CPT/output/$1"
+
+  sshpass -e sftp -oBatchMode=no -b - takealot_uat_if@uatsftp.logfireapps.com
+#sshpass -e sftp -oBatchMode=no -b - sftp-user@remote-host << !
+   #cd incoming
+   #put your-log-file.log
+   #bye
+#!
+}
+
+#run interactive
+alias r1wms="kubectl run wms-service -i --tty --image 10.4.1.39:5000/takealot/tal-with-requirements:master --env='ROLE=KUBERNETES' -- bash -c '/usr/local/tal/tal/bin/gunicorn-docker-entry.sh \"tal.services.wms.server:application\"'"
+#temp create c delete d for k8s:
+alias c1adap="kubectl create -f $TA/adaptris-service"
+alias d1adap="kubectl delete -f $TA/adaptris-service"
+alias c1wms="cat $TA/wms-service/wms-deployment.yaml | sed 's|imagePullPolicy: Always|imagePullPolicy: IfNotPresent|' | kubectl create -f -; kubectl create -f $TA/wms-service/wms-service.yaml"
+alias d1wms="kubectl delete -f $TA/wms-service"
+alias c1dims="kubectl create -f $TA/s4f-dimension-processor-service/warehouse-tsin-dimensions-sftp-consumer-deployment.yaml"
+alias d1dims="kubectl delete -f $TA/s4f-dimension-processor-service/warehouse-tsin-dimensions-sftp-consumer-deployment.yaml"
+alias c1sftp="kubectl create -f $TA/sftp/"
+alias d1sftp="kubectl delete -f $TA/sftp/"
+alias c1kafka="kubectl create -f $TA/kafka/"
+alias d1kafka="kubectl delete -f $TA/kafka/"
+alias c1ingress="kubectl create -f $TA/ingress/"
+alias d1ingress="kubectl delete -f $TA/ingress/"
+
+alias c2wms="$CK create -f $TA/wms-service"
+alias d2wms="$CK delete -f $TA/wms-service"
+alias c2dims="$CK create -f $TA/s4f-dimension-processor-service/"
+alias d2dims="$CK delete -f $TA/s4f-dimension-processor-service/"
+alias c2sftp="$CK create -f $TA/sftp/"
+alias d2sftp="$CK delete -f $TA/sftp/"
+
+alias c3wms="$WMSTESTING create -f $TA/wms-service"
+alias d3wms="$WMSTESTING delete -f $TA/wms-service"
+alias c3dims="$WMSTESTING create -f $TA/s4f-dimension-processor-service/"
+alias d3dims="$WMSTESTING delete -f $TA/s4f-dimension-processor-service/"
+alias c3sftp="$WMSTESTING create -f $TA/sftp/"
+alias d3sftp="$WMSTESTING delete -f $TA/sftp/"
+
+#execute e temp
+alias e1wms="kubectl run c-wms-shell --rm -i --tty --image 10.4.1.39:5000/takealot/tal-with-requirements -- bash"
+#alias e1dims="kubectl run c-dims-shell --rm -i --tty --image 10.4.1.39:5000/takealot/s4f-dimension-processor:master -- bash"
+
+#DEBUGGING DIMS
+alias dec1dimssftp="kubectl create -f $CP/sftp-dimensions-consumer.yaml"
+alias ded1dimssftp="kubectl delete -f $CP/sftp-dimensions-consumer.yaml"
+alias dec1dimswmsapi="kubectl create -f $CP/wmsapi-dimensions-consumer.yaml"
+alias ded1dimswmsapi="kubectl delete -f $CP/wmsapi-dimensions-consumer.yaml"
+dee1dimssftp() {
+  kubectl exec -i -t $1 -- bash -c "kafka_consumer --consumer_type tsin_dimensions_sftp"
+}
+dee1dimswmsapi() {
+  kubectl exec -i -t $1 -- bash -c "kafka_consumer --consumer_type tsin_dimensions_wmsapi"
+}
+alias e1dims2166="kubectl run c-dims-shell --rm -i --tty --image 10.4.1.39:5000/takealot/warehouse_pack:master -- bash"
+
+#
+#patch
+alias p1adap="$PATCH $TP/adaptris-deployment.yaml"
+p1dims() {
+  $PATCH $TP/s4f-dimension-processor/warehouse-tsin-dimensions-sftp-consumer-deployment.yaml
+  $PATCH $TP/s4f-dimension-processor/warehouse-tsin-dimensions-wmsapi-consumerdeployment.yaml
+}
+#
+#view v
+alias vwms="cd $HOME/workspace/tal/tal/services/wms/"
+alias vdims="cd $HOME/workspace/s4f-dimension-processor/;vim ."
+alias vadap="cd $HOME/workspace/tal/tal/services/adaptris/;vim ."
+alias vmrd="cd $HOME/workspace/tal/tal/services/mrd_integration/;vim ."
+alias vkaf="cd $HOME/workspace/tal-kafka/;vim ."
 alias kaf="cd $HOME/git_repos/kafka/code;"
 
 alias k="kubectl"

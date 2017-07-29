@@ -1,4 +1,3 @@
-/home/craig/.Xmodmap
 /home/craig/.xsessionrc
 /home/craig/.i3/config
 /home/craig/saveState.sh
