@@ -1,6 +1,9 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 #
+<<<<<<< HEAD
+export PATH="/home/craig/anaconda3/bin:$PATH"
+=======
 export CURRENTPROJECT="$HOME/workspace/tal/tal/services/mrd_integration/"
 export STERN='stern --context kubernetes-admin@kubernetes'
 export KUBE_UAT_NAMESPACE="wmstesting"
@@ -21,6 +24,7 @@ export PATCH=/home/craig/workspace/cdev/kube/patch.sh
 alias branchinfo="cat $HOME/workspace/cdev/branches_reference"
 alias branchinfoedit="vim $HOME/workspace/cdev/branches_reference"
 
+>>>>>>> a17627644879fd4c7bed0af7c13717f09b7be455
 alias vim=nvim
 alias v=vim .
 alias keys="vim $HOME/.vimkeys.vimrc"
@@ -528,4 +532,3 @@ KCreate() {
 
 # Set the default session name:
 # zstyle ':prezto:module:tmux:session' name 'YOUR DEFAULT SESSION NAME'
-
