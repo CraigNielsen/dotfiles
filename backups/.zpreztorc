@@ -1,9 +1,6 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
-#
-<<<<<<< HEAD
-export PATH="/home/craig/anaconda3/bin:$PATH"
-=======
+
 export CURRENTPROJECT="$HOME/workspace/tal/tal/services/mrd_integration/"
 export STERN='stern --context kubernetes-admin@kubernetes'
 export KUBE_UAT_NAMESPACE="wmstesting"
@@ -24,7 +21,6 @@ export PATCH=/home/craig/workspace/cdev/kube/patch.sh
 alias branchinfo="cat $HOME/workspace/cdev/branches_reference"
 alias branchinfoedit="vim $HOME/workspace/cdev/branches_reference"
 
->>>>>>> a17627644879fd4c7bed0af7c13717f09b7be455
 alias vim=nvim
 alias v=vim .
 alias keys="vim $HOME/.vimkeys.vimrc"
@@ -42,9 +38,11 @@ alias ka="kubectl attach -i -t"
 alias office="$OFFICE"
 alias wmsuat="$UAT"
 alias master="$MASTER"
+alias ptw="ptw -- -x --lf"
 
 #watch network
 alias watchnet="watch -n 1 'sudo netstat -tanop'"
+alias watchsockets="watch -n 1 'ss -s'"
 
 #watching kubes
 alias watch1="$HOME/workspace/cdev/kube/watch_kube.py kubectl"
@@ -178,7 +176,7 @@ alias tk='cd ~/workspace/dev-environments/kubernetes-environments'
 alias set="source <(kubectl completion zsh)"
 alias pa="pyenv activate data-science; python"
 alias config="vim ~/.zpreztorc;"
-alias python=ipython
+alias ipy=ipython
 alias edit='vim ~/.zpreztorc'
 eval $(thefuck --alias f)
 fpath=(~/.zsh/completion $fpath)
@@ -196,7 +194,7 @@ alias ipyvim='pyenv activate neovim3; ipython kernel; watch'
 alias es='cd ~/workspace/tal_big_data/reports/2017-06_grad_big_data/'
 alias sickd='cd ~/workspace/dev-environments/kubernetes-environments/environment/roles/s4f-sick-integration-service/'
 alias adapt='cd ~/workspace/tal/tal/services/adaptris/test/;'
-alias ss='cd ~/workspace/s4f-sick-integration-service/'
+alias sis='cd ~/workspace/s4f-sick-integration-service/'
 alias gogo='cd $HOME/git_repos/kafka/code && ./tal-commands.py'
 alias prod="$CURRENTPROJECT;vim ."
 #end temps
@@ -327,7 +325,9 @@ md() {
   minikube ssh "echo 'Domains=stagealot.com' | sudo tee -a /etc/systemd/resolved.conf"
   minikube ssh "sudo systemctl restart systemd-resolved.service"
 }
-
+findinfiles() {
+  find . -iname $1 | ack --files-from=- $2
+}
 dcc() {
   dc ps | grep Exit
 }
@@ -364,6 +364,26 @@ code-on() {
 jumpbox() {
   ssh-add
   ssh -A craigferguson@jump-box.takealot.com
+}
+watch_sickmachine() {
+  ssh-add
+  ssh -t -A craigferguson@jump-box.takealot.com ./helpers/sickwatch.sh
+}
+restartCPTSICKInline() {
+  ssh-add
+  ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_cpt_inline
+}
+restartCPTSICKStatic() {
+  ssh-add
+  ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_cpt_static
+}
+restartJHBSICKInline() {
+  ssh-add
+  ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_jhb_inline
+}
+restartJHBSICKStatic() {
+  ssh-add
+  ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_jhb_static
 }
 
 gpush() {
@@ -532,3 +552,4 @@ KCreate() {
 
 # Set the default session name:
 # zstyle ':prezto:module:tmux:session' name 'YOUR DEFAULT SESSION NAME'
+
