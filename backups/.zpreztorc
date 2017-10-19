@@ -1,6 +1,7 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
+
 export CURRENTPROJECT="$HOME/workspace/tal/tal/services/mrd_integration/"
 export STERN='stern --context kubernetes-admin@kubernetes'
 export KUBE_UAT_NAMESPACE="wmstesting"
@@ -39,17 +40,33 @@ alias office="$OFFICE"
 alias wmsuat="$UAT"
 alias master="$MASTER"
 alias ptw="ptw -- -x --lf"
+alias tal="cd $HOME/workspace/tal"
+alias sick="cd $HOME/workspace/s4f-sick-integration-service"
 
+alias hwms="helm upgrade --install wms-service ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=/hosthome/craig/workspace/tal,resources.requests.cpu=400m,resources.limits.cpu=430 "
+alias hsick="helm upgrade --install sick-service ~/workspace/s4f-sick-integration-service/charts/s4f-sick-integration-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-sick-integration-service,dev.hostPath=/hosthome/craig/workspace/s4f-sick-integration-service,resources.requests.cpu=300m,resources.limits.cpu=330 "
+alias htimer="helm upgrade --install s4f-timer-service ~/workspace/s4f-timer-service/charts/s4f-timer-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-timer-service,dev.hostPath=/hosthome/craig/workspace/s4f-timer-service,resources.requests.cpu=300m,resources.limits.cpu=330 "
+alias horders="helm upgrade --install order-service ~/workspace/tal/charts/order-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=/hosthome/craig/workspace/tal,resources.requests.cpu=300m,resources.limits.cpu=330 "
+alias hcomms="helm upgrade --install s4f-comms-service ~/workspace/s4f-comms-service/charts/s4f-comms-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-comms-service/comms_service,dev.hostPath=/hosthome/craig/workspace/s4f-comms-service/comms_service,resources.requests.cpu=300m,resources.limits.cpu=330 "
+alias hdel='helm del --purge'
 #watch network
 alias watchnet="watch -n 1 'sudo netstat -tanop'"
 alias watchsockets="watch -n 1 'ss -s'"
 
+alias suat="stern --context kubernetes-admin@kubernetes -n wmsuat"
+alias smaster="stern --context kubernetes-admin@kubernetes -n master"
 #watching kubes
 alias watch1="$HOME/workspace/cdev/kube/watch_kube.py kubectl"
+alias watchuat="$HOME/workspace/cdev/kube/watch_uat.py"
 #alias watch2="$HOME/workspace/cdev/kube/watch_kube.py '$CK'"
 
 alias pods_wmstesting="watch -n 1 'kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pods'"
 
+restart_kube() {
+  minikube stop
+  minikube start
+  echo 'md'
+}
 watch_wmstesting() {
   #sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
 
@@ -63,6 +80,9 @@ watch_mini() {
   $HOME/workspace/cdev/kube/stern_local.py
   $HOME/workspace/cdev/kube/watch_pods.py kubectl
   exit
+}
+lf () {
+  ls | grep $1
 }
 
 watch3() {
@@ -166,6 +186,7 @@ alias kaf="cd $HOME/git_repos/kafka/code;"
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
+alias ksetup="source <(helm completion zsh)"
 alias kc="kubectl create"
 alias kgp="kubectl get pods -owide --all-namespaces --show-all"
 alias kdd="kubectl delete deployment"
