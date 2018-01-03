@@ -4,3 +4,4 @@
 /home/craig/loadState.sh
 /home/craig/.zpreztorc
 /home/craig/.pylintrc
+/home/craig/.tmux.conf
