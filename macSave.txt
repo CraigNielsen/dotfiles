@@ -3,3 +3,4 @@
 /Users/craig.ferguson/.pylintrc
 /Users/craig.ferguson/.zpreztorc
 /Users/craig.ferguson/.config/nvim/init.vim
+/Users/craig.ferguson/.tmux.conf
