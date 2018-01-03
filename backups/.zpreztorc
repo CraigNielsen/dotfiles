@@ -1,8 +1,8 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
-
 export CURRENTPROJECT="$HOME/workspace/tal/tal/services/mrd_integration/"
+export OS='/Users/craig.ferguson'
 export STERN='stern --context kubernetes-admin@kubernetes'
 export KUBE_UAT_NAMESPACE="wmstesting"
 export KUBE_CRAIG_NAMESPACE="craig"
@@ -16,21 +16,28 @@ export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/r
 export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
 export CP=$HOME/workspace/cdev/kube/deployments
 export PATH=$PATH:/opt/hub-linux-amd64-2.3.0-pre9/bin/
+export PATH=$PATH:/opt/bin/
 export PATCH=/home/craig/workspace/cdev/kube/patch.sh
+export GREP_OPTIONS='--color=auto'
 
 alias branchinfo="cat $HOME/workspace/cdev/branches_reference"
 alias branchinfoedit="vim $HOME/workspace/cdev/branches_reference"
 
-alias vim=vim
 alias v=vim .
-alias keys="vim $HOME/.vimkeys.vimrc"
+#alias keys="vim $HOME/.vimkeys.vimrc"
 alias keys="vim $HOME/keys.vimrc"
+alias shortcuts="vim $HOME/.khdrc"
 alias plug="vim $HOME/plug.vimrc"
 alias dc=docker-compose
 alias n="nautilus"
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
 #
 #alias officek='kubectl --context kubernetes-admin@kubernetes'
+alias helpibt='open -a "Google Chrome" https://jira.takealot.com/wiki/display/TET/Auto+IBT+Process'
+alias prodk='kubectl --context production'
+pkd(){
+  kubectl --context production delete pod $1
+}
 alias ck="$CK"
 alias wmstesting="$WMSTESTING"
 alias ke="kubectl exec -i -t"
@@ -40,14 +47,45 @@ alias wmsuat="$UAT"
 alias master="$MASTER"
 alias ptw="ptw -- -x --lf"
 alias tal="cd $HOME/workspace/tal"
+alias dimms="cd $HOME/workspace/s4f-dimension-processor"
 alias sick="cd $HOME/workspace/s4f-sick-integration-service"
-alias kaf='cd $HOME/git_repos/future-apps/kafka-kube'
 
-alias hwms="helm upgrade --install wms-service ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=/hosthome/craig/workspace/tal,resources.requests.cpu=400m,resources.limits.cpu=430 "
-alias hsick="helm upgrade --install sick-service ~/workspace/s4f-sick-integration-service/charts/s4f-sick-integration-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-sick-integration-service,dev.hostPath=/hosthome/craig/workspace/s4f-sick-integration-service,resources.requests.cpu=300m,resources.limits.cpu=330 "
-alias htimer="helm upgrade --install s4f-timer-service ~/workspace/s4f-timer-service/charts/s4f-timer-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-timer-service,dev.hostPath=/hosthome/craig/workspace/s4f-timer-service,resources.requests.cpu=300m,resources.limits.cpu=330 "
-alias horders="helm upgrade --install order-service ~/workspace/tal/charts/order-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=/hosthome/craig/workspace/tal,resources.requests.cpu=300m,resources.limits.cpu=330 "
-alias hcomms="helm upgrade --install s4f-comms-service ~/workspace/s4f-comms-service/charts/s4f-comms-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-comms-service/comms_service,dev.hostPath=/hosthome/craig/workspace/s4f-comms-service/comms_service,resources.requests.cpu=300m,resources.limits.cpu=330 "
+# DIMs
+pushdims() {
+  md
+  here=$(pwd)
+  cd $HOME/workspace/s4f-dimension-processor && docker build -t image-registry.ci.env:80/takealot/s4f-dimension-processor:WMS-1910 . && docker push image-registry.ci.env:80/takealot/s4f-dimension-processor:WMS-1910
+  cd $here
+  sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmsuat get pod -o name | grep sftp-consumer | sed 's/pods\///')
+  wmsapi=$(kubectl --context kubernetes-admin@kubernetes --namespace wmsuat get pod -o name | grep wmsapi-consumer | sed 's/pods\///')
+  kubectl --context kubernetes-admin@kubernetes --namespace wmsuat delete pod  $sftp
+  kubectl --context kubernetes-admin@kubernetes --namespace wmsuat delete pod  $wmsapi
+}
+add_sftp_file_uat() {
+  here=$(pwd)
+  cd $HOME/workspace/cdev/helpers/sftp
+  python uat_sftp_client.py
+  cd $here
+
+}
+
+hiuat() {
+  helm upgrade --install $1 --kube-context kubernetes-admin@kubernetes  $2 --namespace wmsuat
+}
+hduat() {
+  helm del --purge --kube-context kubernetes-admin@kubernetes $1
+}
+huatls() {
+  helm --kube-context kubernetes-admin@kubernetes --namespace wmsuat ls
+}
+
+alias hwms="helm upgrade --install wms-service ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,resources.requests.cpu=400m,resources.limits.cpu=430 "
+alias hdims="helm upgrade --install dims $OS/workspace/s4f-dimension-processor/charts/s4f-dimensions-processor --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-dimension-processor,dev.mountPath=/usr/local/tal/s4f-dimension-processor,image.tag=WMS-1910,resources.requests.cpu=300m,resources.limits.cpu=330"
+alias hswms="helm upgrade --install service-wmsm ~/workspace/service_wms/charts/s3f-wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/service_wms,resources.requests.cpu=400m,resources.limits.cpu=430 "
+alias hsick="helm upgrade --install sick-service $HOME/workspace/s4f-sick-integration-service/charts/s4f-sick-integration-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-sick-integration-service,dev.hostPath=$HOME/workspace/s4f-sick-integration-service,resources.requests.cpu=300m,resources.limits.cpu=330"
+alias htimer="helm upgrade --install s4f-timer-service ~/workspace/s4f-timer-service/charts/s4f-timer-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-timer-service,dev.hostPath=`pwd`/workspace/s4f-timer-service,resources.requests.cpu=300m,resources.limits.cpu=330 "
+alias horders="helm upgrade --install order-service ~/workspace/tal/charts/order-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=`pwd`/workspace/tal,resources.requests.cpu=300m,resources.limits.cpu=330 "
+alias hcomms="helm upgrade --install comms ~/workspace/s4f-comms-service/charts/s4f-comms-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-comms-service/comms_service,dev.hostPath=`pwd`/workspace/s4f-comms-service/comms_service,resources.requests.cpu=300m,resources.limits.cpu=330 "
 alias hdel='helm del --purge'
 #watch network
 alias watchnet="watch -n 1 'sudo netstat -tanop'"
@@ -56,11 +94,23 @@ alias watchsockets="watch -n 1 'ss -s'"
 alias suat="stern --context kubernetes-admin@kubernetes -n wmsuat"
 alias smaster="stern --context kubernetes-admin@kubernetes -n master"
 #watching kubes
-alias watch1="$HOME/workspace/cdev/kube/watch_kube.py kubectl"
-alias watchuat="$HOME/workspace/cdev/kube/watch_uat.py"
+#alias watch1="$HOME/workspace/cdev/kube/watch_kube.py kubectl"
+#alias watch1="watch -n 1 'kubectl get pods --all-namespaces'"
+#alias watchuat="$HOME/workspace/cdev/kube/watch_uat.py"
 #alias watch2="$HOME/workspace/cdev/kube/watch_kube.py '$CK'"
 
 alias pods_wmstesting="watch -n 1 'kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pods'"
+alias protoc26='/usr/local/opt/protobuf@2.6/bin/protoc'
+
+generateprotocomms(){
+  #protoc26 -I=$SRC_DIR_of_.proto_files --python_out=$DST_DIR_for.py_serializers $SRC_DIR/path_to_file.proto
+  protoc26='/usr/local/opt/protobuf@2.6/bin/protoc'
+  cd $HOME/workspace/s4f-protocol-buffers
+  protoc26 -I . --python_out=../s4f-python-clients/s4f_clients/compiled_protobuffs ./*.proto
+  protoc26 -I . --python_out=../s4f-comms-service/comms_service/compiled_protobuffs ./*.proto
+}
+alias generate_comms_service_protobuffs=""
+
 
 restart_kube() {
   minikube stop
@@ -75,6 +125,17 @@ watch_wmstesting() {
 
   # watch logs for testing namespace tsin specific
   $HOME/workspace/cdev/kube/sterntsinconsumers.py wmstesting
+}
+wmsuate() {
+  kubectl --context kubernetes-admin@kubernetes --namespace wmsuat exec -it $1 bash
+}
+watchuat() {
+  ttab -t "UAT"  "watch -n 1 'kubectl --context kubernetes-admin@kubernetes get pods --namespace wmsuat'"
+  ttab -t "UAT"  "watch -n 1 'kubectl --context kubernetes-admin@kubernetes get services --namespace wmsuat'"
+}
+watch1() {
+  ttab -t "MINIKUBE"  "watch -n 1 'kubectl get pods --all-namespaces'"
+  ttab -t "MINIKUBE"  "watch -n 1 'kubectl get services --all-namespaces'"
 }
 watch_mini() {
   $HOME/workspace/cdev/kube/stern_local.py
@@ -109,35 +170,48 @@ start_code() {
   nohup hipchat4 &
   nohup chromium --new-window https://calendar.google.com/calendar/render
 }
-add_sftp_file(){
+sftp_uat() {
+  echo '(|EP4).C'
+  sftp takealot_uat_if@uatsftp.logfireapps.com
+}
+sftp_box(){
+ export sftp="Pt8e$d7W%7e"
+ sftp takealotif@b1sftplogfireapps.com
+}
+#add_sftp_file(){
   #sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
   #wmstesting exec -i -t $sftp -- bash -c "cp /tmp/CUB_TEST_001 /home/wms/data/TAL/CPT/output/$1"
 
-  sshpass -e sftp -oBatchMode=no -b - takealot_uat_if@uatsftp.logfireapps.com
+  #sshpass -e sftp -oBatchMode=no -b - takealot_uat_if@uatsftp.logfireapps.com
 #sshpass -e sftp -oBatchMode=no -b - sftp-user@remote-host << !
    #cd incoming
    #put your-log-file.log
    #bye
 #!
-}
+#}
 
 #run interactive
 alias r1wms="kubectl run wms-service -i --tty --image 10.4.1.39:5000/takealot/tal-with-requirements:master --env='ROLE=KUBERNETES' -- bash -c '/usr/local/tal/tal/bin/gunicorn-docker-entry.sh \"tal.services.wms.server:application\"'"
 #temp create c delete d for k8s:
-alias c1adap="kubectl create -f $TA/adaptris-service"
-alias d1adap="kubectl delete -f $TA/adaptris-service"
-alias c1wms="cat $TA/wms-service/wms-deployment.yaml | sed 's|imagePullPolicy: Always|imagePullPolicy: IfNotPresent|' | kubectl create -f -; kubectl create -f $TA/wms-service/wms-service.yaml"
-alias d1wms="kubectl delete -f $TA/wms-service"
-alias c1dims="kubectl create -f $TA/s4f-dimension-processor-service/warehouse-tsin-dimensions-sftp-consumer-deployment.yaml"
-alias d1dims="kubectl delete -f $TA/s4f-dimension-processor-service/warehouse-tsin-dimensions-sftp-consumer-deployment.yaml"
-alias c1sftp="kubectl create -f $TA/sftp/"
-alias d1sftp="kubectl delete -f $TA/sftp/"
-alias c1kafka="kubectl create -f $TA/kafka/"
-alias d1kafka="kubectl delete -f $TA/kafka/"
-alias c1ingress="kubectl create -f $TA/ingress/"
-alias d1ingress="kubectl delete -f $TA/ingress/"
+#alias c1adap="kubectl create -f $TA/adaptris-service"
+#alias d1adap="kubectl delete -f $TA/adaptris-service"
+#alias c1wms="cat $TA/wms-service/wms-deployment.yaml | sed 's|imagePullPolicy: Always|imagePullPolicy: IfNotPresent|' | kubectl create -f -; kubectl create -f $TA/wms-service/wms-service.yaml"
+#alias d1wms="kubectl delete -f $TA/wms-service"
+#alias c1dims="kubectl create -f $TA/s4f-dimension-processor-service/warehouse-tsin-dimensions-sftp-consumer-deployment.yaml"
+#alias d1dims="kubectl delete -f $TA/s4f-dimension-processor-service/warehouse-tsin-dimensions-sftp-consumer-deployment.yaml"
+#alias c1kafka="kubectl create -f $TA/kafka/"
+#alias d1kafka="kubectl delete -f $TA/kafka/"
+#alias c1ingress="kubectl create -f $TA/ingress/"
+#alias d1ingress="kubectl delete -f $TA/ingress/"
 
-alias c2wms="$CK create -f $TA/wms-service"
+alias csicks="kubectl create -f $HOME/workspace/cdev/kube/deployments/sick_server"
+alias dsicks="kubectl delete -f $HOME/workspace/cdev/kube/deployments/sick_server --grace-period=5"
+alias csickc="kubectl create -f $HOME/workspace/cdev/kube/deployments/sick-client-deployment.yml"
+alias dsickc="kubectl delete -f $HOME/workspace/cdev/kube/deployments/sick-client-deployment.yml --grace-period=5"
+#alias csickc="kubectl create -f $HOME/workspace/cdev/kube/deployments/sick-client-pdb-deployment.yml"
+#alias dsickc="kubectl delete -f $HOME/workspace/cdev/kube/deployments/sick-client-pdb-deployment.yml"
+alias csftp="kubectl create -f $TA/sftp/"
+alias dsftp="kubectl delete -f $TA/sftp/"
 alias d2wms="$CK delete -f $TA/wms-service"
 alias c2dims="$CK create -f $TA/s4f-dimension-processor-service/"
 alias d2dims="$CK delete -f $TA/s4f-dimension-processor-service/"
@@ -182,24 +256,27 @@ alias vdims="cd $HOME/workspace/s4f-dimension-processor/;vim ."
 alias vadap="cd $HOME/workspace/tal/tal/services/adaptris/;vim ."
 alias vmrd="cd $HOME/workspace/tal/tal/services/mrd_integration/;vim ."
 alias vkaf="cd $HOME/workspace/tal-kafka/;vim ."
+<<<<<<< HEAD
 alias run="python manage.py runserver"
 #alias size="/home/craig/.screenlayout/laptop.sh"
 alias rec="/home/craig/git_repos/receipts/receipts_server"
+=======
+alias kaf="cd $HOME/git_repos/kafka/code;"
+>>>>>>> e8b2045bee7d65cd31af4a5b9078c88cf51a8b34
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
 alias ksetup="source <(helm completion zsh)"
 alias kc="kubectl create"
-alias kgp="kubectl get pods"
-alias roomates="cd $HOME/git_repos/roomates"
-alias pj2="cd $HOME/git_repos/django-dignity-parallax/webapp"
+alias kgp="kubectl get pods -owide --all-namespaces --show-all"
+alias pgp="kubectl --context production get pods -owide --all-namespaces --show-all"
 alias kdd="kubectl delete deployment"
 alias minikubedockerexit='eval $(minikube docker-env -u)'
 alias reload='exec $SHELL -l'
 alias pj='cd ~/git_repos/psychicjenha/frontend'
-alias tk='cd ~/workspace/dev-environments/kubernetes-environments'
+alias tk='cd ~/workspace/tal-kubernetes'
 alias set="source <(kubectl completion zsh)"
-alias pa="pyenv activate data-science; python"
+alias pa="pyenv activate testing; ipython"
 alias config="vim ~/.zpreztorc;"
 alias ipy=ipython
 alias edit='vim ~/.zpreztorc'
@@ -230,9 +307,14 @@ eval "$(pyenv virtualenv-init -)"
 setopt correct
 unsetopt correctall
 
+pep() {
+    kubectl --context production exec -i -t $1 bash
+}
+
 zstyle ':prezto:load' pmodule \
          'environment' \
          'terminal' \
+         'tmux' \
          'editor' \
          'history' \
          'directory' \
@@ -308,6 +390,12 @@ pullta() {
   fi
 }
 
+kill_local() {
+  NAME=$(kubectl get pod -o name | grep wmsapi-consumer | sed 's/pods\///')
+  wmsapi=$(kubectl get pod -o name | grep wmsapi-consumer | sed 's/pods\///')
+  kubectl delete pod  $NAME
+  kubectl delete pod  $wmsapi
+}
 TESTD() {
   NAME=$(kubectl get pod -o name | grep dimensions | sed 's/pods\///')
   kubectl exec  $NAME -- bash -c "pip install pytest pudb unittest2 mock"
@@ -382,7 +470,9 @@ cd ~/workspace/cdev/adaptris
 dc exec adaptris pip install pytest pytest-watch;
 dc exec adaptris bash -c 'cd tal/services/adaptris/test; ptw -- -x --lf;';
 }
-
+update-delete-repo() {
+  cd $1 && git remote -vv && cd .. && sudo rm -rf $1
+}
 code-on() {
   git checkout -b $1 origin/master
 }
@@ -390,25 +480,111 @@ jumpbox() {
   ssh-add
   ssh -A craigferguson@jump-box.takealot.com
 }
-watch_sickmachine() {
-  ssh-add
-  ssh -t -A craigferguson@jump-box.takealot.com ./helpers/sickwatch.sh
+grep_restapi01() {
+  ttab  -t "Rest API 01" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh tal-rest-api01 'cat /var/log/supervisor/services.order.error.log*'\" | grep '$1'"
 }
-restartCPTSICKInline() {
-  ssh-add
-  ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_cpt_inline
+grep_restapi02() {
+  ttab  -t "Rest API 02" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh tal-rest-api02 'cat /var/log/supervisor/services.order.error.log*'\" | grep '$1'"
 }
-restartCPTSICKStatic() {
-  ssh-add
-  ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_cpt_static
+grep_restapi03() {
+  ttab  -t "Rest API 03" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh tal-rest-api03 'cat /var/log/supervisor/services.order.error.log*'\" | grep '$1'"
 }
-restartJHBSICKInline() {
-  ssh-add
-  ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_jhb_inline
+grep_restapi04() {
+  ttab  -t "Rest API 04" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh tal-rest-api04 'cat /var/log/supervisor/services.order.error.log*'\" | grep '$1'"
 }
-restartJHBSICKStatic() {
+grep_orders() {
   ssh-add
-  ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_jhb_static
+  $(grep_restapi01 "$1")
+  $(grep_restapi02 "$1")
+  $(grep_restapi03 "$1")
+  $(grep_restapi04 "$1")
+}
+grep_wmsapi02() {
+  ttab  -t "WMSAPI02" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh wmsapi02 'cat /var/log/supervisor/services.wms.error.log*'\" | grep '$1'"
+}
+grep_wmsapi03() {
+  ttab  -t "WMSAPI03" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh wmsapi03 'cat /var/log/supervisor/services.wms.error.log*'\" | grep '$1'"
+}
+grep_wmsapi05() {
+  ttab  -t "WMSAPI05" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh wmsapi05 'cat /var/log/supervisor/services.wms.error.log*'\" | grep '$1'"
+}
+grep_wmsapi() {
+  ssh-add
+  $(grep_wmsapi02 "$1")
+  $(grep_wmsapi03 "$1")
+  $(grep_wmsapi05 "$1")
+}
+grep_wmsapi_short() {
+  ttab  -t "WMSAPI02" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh wmsapi02 'cat /var/log/supervisor/services.wms.error.log'\" | grep '$1'"
+  ttab  -t "WMSAPI03" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh wmsapi03 'cat /var/log/supervisor/services.wms.error.log'\" | grep '$1'"
+  ttab  -t "WMSAPI05" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh wmsapi05 'cat /var/log/supervisor/services.wms.error.log'\" | grep '$1'"
+}
+tail_mrd() {
+  ssh-add
+  ttab  -t "MRD" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh mrd01 'tail -n 1000 /var/log/supervisor/mrd.log'\" | grep '$1';ssh -t -A craigferguson@jump-box.takealot.com \"ssh mrd02 'tail -n 1000 /var/log/supervisor/mrd.log'\" | grep '$1'"
+}
+grep_mrd() {
+  ssh-add
+  ttab  -t "MRD" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh mrd01 'cat /var/log/supervisor/mrd.log*'\" | grep '$1';ssh -t -A craigferguson@jump-box.takealot.com \"ssh mrd02 'cat /var/log/supervisor/mrd.log*'\" | grep '$1'"
+}
+grep_cpt_sick_logs() {
+  ssh-add
+  ttab -t "SICK cpt inline 1" -w "ssh -t -A craigferguson@jump-box.takealot.com \"ssh s4f-services01 'cat /var/log/supervisor/tcp_socket_client_cpt_inline_01.0.log | grep $1'\" | grep '$1' ;"
+  ttab -t "SICK cpt static 1" -w "ssh -t -A craigferguson@jump-box.takealot.com \"ssh s4f-services01 'cat /var/log/supervisor/tcp_socket_client_cpt_static_01.0.log | grep $1'\" | grep '$1' ;"
+  ttab -t "SICK cpt static 2" -w "ssh -t -A craigferguson@jump-box.takealot.com \"ssh s4f-services01 'cat /var/log/supervisor/tcp_socket_client_cpt_static_02.0.log | grep $1'\" | grep '$1' ;"
+}
+grep_jhb_sick_logs() {
+  ssh-add
+  ttab -t "SICK jhb inline 1" -w "ssh -t -A craigferguson@jump-box.takealot.com \"ssh s4f-services01 'cat /var/log/supervisor/tcp_socket_client_jhb_inline_01.0.log | grep $1'\" | grep '$1' ;"
+  ttab -t "SICK jhb inline 2" -w "ssh -t -A craigferguson@jump-box.takealot.com \"ssh s4f-services01 'cat /var/log/supervisor/tcp_socket_client_jhb_inline_02.0.log | grep $1'\" | grep '$1' ;"
+  ttab -t "SICK jhb static 1" -w "ssh -t -A craigferguson@jump-box.takealot.com \"ssh s4f-services01 'cat /var/log/supervisor/tcp_socket_client_jhb_static_01.0.log | grep $1'\" | grep '$1' ;"
+  ttab -t "SICK jhb static 2" -w "ssh -t -A craigferguson@jump-box.takealot.com \"ssh s4f-services01 'cat /var/log/supervisor/tcp_socket_client_jhb_static_02.0.log | grep $1'\" | grep '$1' ;"
+  }
+  showcode() {
+    ssh-add
+    local temppath="/usr/local/tal/tal/$2"
+    ssh -A craigferguson@jump-box.takealot.com ssh $1 cat $temppath
+  }
+  watch_sickmachine() {
+    ssh-add
+    ssh -t -A craigferguson@jump-box.takealot.com ./helpers/sickwatch.sh
+  }
+  restartCPTSICKInline() {
+    ssh-add
+    ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_cpt_inline
+  }
+  restartCPTSICKStatic01() {
+    ssh-add
+    ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_cpt_static_01
+  }
+  restartCPTSICKStatic02() {
+    ssh-add
+    ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_cpt_static_02
+  }
+  restartJHBSICKInline() {
+    ssh-add
+    ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_jhb_inline
+  }
+  restartJHBSICKStatic() {
+    ssh-add
+    ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_jhb_static
+  }
+
+  stop_retry_failed_order_injections() {
+    #ssh -t -A craigferguson@jump-box.takealot.com "ssh toor@wmsapi02 ps aux | grep retry | awk '{print \$2}' | head -1 | xargs kill"
+    ssh -t -A craigferguson@jump-box.takealot.com "ssh toor@wmsapi02 pkill -KILL -f retry_failed"
+    #
+    #ssh -t -A craigferguson@jump-box.takealot.com "kill \$(ps -ef | grep retry | awk '{ print \$2}' | head -1)"
+  }
+show_activate() {
+  echo 'export ROLE=DC;source /usr/local/tal/tal/venv/bin/activate; export PYTHONPATH=/usr/local/tal/tal;'
+}
+retry_failed_order_injections() {
+    ttab  -t "retry oi" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh toor@wmsapi02 'export ROLE=DC;source /usr/local/tal/tal/venv/bin/activate; export PYTHONPATH=/usr/local/tal/tal; python /usr/local/tal/tal/tal/services/outbound_orders/bin/retry_failed_order_injections.py'\" "
+}
+run_on_wms() {
+    ssh-add
+    ssh -tt -A craigferguson@jump-box.takealot.com "ssh -t wmsapi02 bash -l "
 }
 
 gpush() {
@@ -445,6 +621,9 @@ KRun() {
 }
 KCreate() {
   cat "kafka-topics --zookeeper 127.0.0.1:2181 --create --topic $1 --partitions 3 --replication-factor 1" | sed 's_$1_'$1'_' | KRun -
+}
+catdifffile() {
+  cat diffs| awk '{print $14}' | awk '{print "("$1 " AND ERROR)"}'
 }
 
 # Auto convert .... to ../..
@@ -567,7 +746,7 @@ KCreate() {
 #
 
 # Auto start a session when Zsh is launched in a local terminal.
-# zstyle ':prezto:module:tmux:auto-start' local 'yes'
+ zstyle ':prezto:module:tmux:auto-start' local 'yes'
 
 # Auto start a session when Zsh is launched in a SSH connection.
 # zstyle ':prezto:module:tmux:auto-start' remote 'yes'
@@ -576,5 +755,4 @@ KCreate() {
 # zstyle ':prezto:module:tmux:iterm' integrate 'yes'
 
 # Set the default session name:
-# zstyle ':prezto:module:tmux:session' name 'YOUR DEFAULT SESSION NAME'
-
+ zstyle ':prezto:module:tmux:session' name 'CraigSession'
