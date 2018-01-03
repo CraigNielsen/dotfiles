@@ -1,6 +1,6 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
-
+export TERM="xterm-256color"
 export CURRENTPROJECT="$HOME/workspace/tal/tal/services/mrd_integration/"
 export OS='/Users/craig.ferguson'
 export STERN='stern --context kubernetes-admin@kubernetes'
@@ -18,7 +18,7 @@ export CP=$HOME/workspace/cdev/kube/deployments
 export PATH=$PATH:/opt/hub-linux-amd64-2.3.0-pre9/bin/
 export PATH=$PATH:/opt/bin/
 export PATCH=/home/craig/workspace/cdev/kube/patch.sh
-export GREP_OPTIONS='--color=auto'
+#export GREP_OPTIONS='--color=auto'
 
 alias branchinfo="cat $HOME/workspace/cdev/branches_reference"
 alias branchinfoedit="vim $HOME/workspace/cdev/branches_reference"
@@ -256,13 +256,10 @@ alias vdims="cd $HOME/workspace/s4f-dimension-processor/;vim ."
 alias vadap="cd $HOME/workspace/tal/tal/services/adaptris/;vim ."
 alias vmrd="cd $HOME/workspace/tal/tal/services/mrd_integration/;vim ."
 alias vkaf="cd $HOME/workspace/tal-kafka/;vim ."
-<<<<<<< HEAD
 alias run="python manage.py runserver"
 #alias size="/home/craig/.screenlayout/laptop.sh"
 alias rec="/home/craig/git_repos/receipts/receipts_server"
-=======
 alias kaf="cd $HOME/git_repos/kafka/code;"
->>>>>>> e8b2045bee7d65cd31af4a5b9078c88cf51a8b34
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
