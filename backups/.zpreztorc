@@ -183,7 +183,7 @@ alias vadap="cd $HOME/workspace/tal/tal/services/adaptris/;vim ."
 alias vmrd="cd $HOME/workspace/tal/tal/services/mrd_integration/;vim ."
 alias vkaf="cd $HOME/workspace/tal-kafka/;vim ."
 alias run="python manage.py runserver"
-alias size="/home/craig/.screenlayout/laptop.sh"
+#alias size="/home/craig/.screenlayout/laptop.sh"
 alias rec="/home/craig/git_repos/receipts/receipts_server"
 
 alias k="kubectl"
