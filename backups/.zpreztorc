@@ -16,13 +16,12 @@ export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/r
 export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
 export CP=$HOME/workspace/cdev/kube/deployments
 export PATH=$PATH:/opt/hub-linux-amd64-2.3.0-pre9/bin/
-export PATH=$PATH:/opt/bin/
 export PATCH=/home/craig/workspace/cdev/kube/patch.sh
 
 alias branchinfo="cat $HOME/workspace/cdev/branches_reference"
 alias branchinfoedit="vim $HOME/workspace/cdev/branches_reference"
 
-alias vim=nvim
+alias vim=vim
 alias v=vim .
 alias keys="vim $HOME/.vimkeys.vimrc"
 alias keys="vim $HOME/keys.vimrc"
@@ -42,6 +41,7 @@ alias master="$MASTER"
 alias ptw="ptw -- -x --lf"
 alias tal="cd $HOME/workspace/tal"
 alias sick="cd $HOME/workspace/s4f-sick-integration-service"
+alias kaf='cd $HOME/git_repos/future-apps/kafka-kube'
 
 alias hwms="helm upgrade --install wms-service ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=/hosthome/craig/workspace/tal,resources.requests.cpu=400m,resources.limits.cpu=430 "
 alias hsick="helm upgrade --install sick-service ~/workspace/s4f-sick-integration-service/charts/s4f-sick-integration-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-sick-integration-service,dev.hostPath=/hosthome/craig/workspace/s4f-sick-integration-service,resources.requests.cpu=300m,resources.limits.cpu=330 "
@@ -182,13 +182,17 @@ alias vdims="cd $HOME/workspace/s4f-dimension-processor/;vim ."
 alias vadap="cd $HOME/workspace/tal/tal/services/adaptris/;vim ."
 alias vmrd="cd $HOME/workspace/tal/tal/services/mrd_integration/;vim ."
 alias vkaf="cd $HOME/workspace/tal-kafka/;vim ."
-alias kaf="cd $HOME/git_repos/kafka/code;"
+alias run="python manage.py runserver"
+alias size="/home/craig/.screenlayout/laptop.sh"
+alias rec="/home/craig/git_repos/receipts/receipts_server"
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
 alias ksetup="source <(helm completion zsh)"
 alias kc="kubectl create"
-alias kgp="kubectl get pods -owide --all-namespaces --show-all"
+alias kgp="kubectl get pods"
+alias roomates="cd $HOME/git_repos/roomates"
+alias pj2="cd $HOME/git_repos/django-dignity-parallax/webapp"
 alias kdd="kubectl delete deployment"
 alias minikubedockerexit='eval $(minikube docker-env -u)'
 alias reload='exec $SHELL -l'
