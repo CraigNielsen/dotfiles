@@ -32,4 +32,3 @@ echo 'pulling dotfiles files'
 cd $HOME/workspace/cdev
 git pull
 echo 'pulling takealot dev files'
-#_____
