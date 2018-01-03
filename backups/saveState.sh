@@ -30,6 +30,10 @@ cd $HOME/vim_projects
 check 'vim projects'
 echo ''
 #_____
+cd $HOME/.tmuxinator
+check 'tmuxinator'
+echo ''
+#_____
 cd $HOME/workspace/cdev
 check 'takealot dev'
 echo ''

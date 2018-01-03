@@ -29,6 +29,10 @@ git pull
 cd $HOME/git_repos/craig_help
 echo 'pulling dotfiles files'
 #_____
+cd $HOME/.tmuxinator
+git pull
+echo 'pulling tmuxinator project files'
+#_____
 cd $HOME/workspace/cdev
 git pull
 echo 'pulling takealot dev files'
