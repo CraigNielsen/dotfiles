@@ -14,7 +14,8 @@ fi
 check() {
   print $PWD
   a=$(git status | grep -c "modified")
-  if [[ $a > 0 ]]
+  b=$(git status | grep -c "Untracked")
+  if [[ $a > 0 || $b > 0 ]]
   then
     echo $1" has been modified"
     git add .
