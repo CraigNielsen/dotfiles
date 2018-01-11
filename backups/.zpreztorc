@@ -100,14 +100,21 @@ alias smaster="stern --context kubernetes-admin@kubernetes -n master"
 #alias watch2="$HOME/workspace/cdev/kube/watch_kube.py '$CK'"
 
 alias pods_wmstesting="watch -n 1 'kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pods'"
-alias protoc26='/usr/local/opt/protobuf@2.6/bin/protoc'
-
-generateprotocomms(){
+os=$(uname -s)
+if [[ $os = Linux ]];
+then
+  echo config for $os
+  alias protoc26='/usr/local/bin/protoc'
+else
+  echo config for $os
+  alias protoc26='/usr/local/opt/protobuf@2.6/bin/protoc'
+fi
+generateprotota(){
   #protoc26 -I=$SRC_DIR_of_.proto_files --python_out=$DST_DIR_for.py_serializers $SRC_DIR/path_to_file.proto
-  protoc26='/usr/local/opt/protobuf@2.6/bin/protoc'
   cd $HOME/workspace/s4f-protocol-buffers
   protoc26 -I . --python_out=../s4f-python-clients/s4f_clients/compiled_protobuffs ./*.proto
   protoc26 -I . --python_out=../s4f-comms-service/comms_service/compiled_protobuffs ./*.proto
+  protoc26 -I . --python_out=../s4f-shipping-options-service/shipping_options_service/compiled_protobuffs ./*.proto
 }
 alias generate_comms_service_protobuffs=""
 
@@ -260,6 +267,7 @@ alias run="python manage.py runserver"
 #alias size="/home/craig/.screenlayout/laptop.sh"
 alias rec="/home/craig/git_repos/receipts/receipts_server"
 alias kaf="cd $HOME/git_repos/kafka/code;"
+alias fa='cd $HOME/git_repos/future-apps'
 
 alias k="kubectl"
 alias ksetup="source <(kubectl completion zsh)"
@@ -753,3 +761,5 @@ catdifffile() {
 
 # Set the default session name:
  zstyle ':prezto:module:tmux:session' name 'CraigSession'
+#source files
+source $HOME/workspace/cdev/helpers/kafka/kafka_util.sh
