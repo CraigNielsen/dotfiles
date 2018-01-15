@@ -284,7 +284,6 @@ alias set="source <(kubectl completion zsh)"
 alias pa="pyenv activate testing; ipython"
 alias config="vim ~/.zpreztorc;"
 alias ipy=ipython
-alias edit='vim ~/.zpreztorc'
 eval $(thefuck --alias f)
 fpath=(~/.zsh/completion $fpath)
 autoload -Uz compinit && compinit -i
