@@ -27,10 +27,6 @@ cd $HOME/.config/nvim/UltiSnips
 check "ultisnips"
 echo ''
 #_____
-cd $HOME/vim_projects
-check 'vim projects'
-echo ''
-#_____
 cd $HOME/.tmuxinator
 check 'tmuxinator'
 echo ''

@@ -17,9 +17,6 @@ fi
 cd $HOME/.config/nvim/UltiSnips
 echo 'pulling UltiSnips'
 git pull
-cd $HOME/vim_projects
-echo 'pulling vim_projects'
-git pull
 cd $HOME/.config/nvim/config
 echo 'pulling zprezto files'
 git pull
