@@ -25,9 +25,9 @@ alias branchinfoedit="vim $HOME/workspace/cdev/branches_reference"
 
 alias v=vim .
 #alias keys="vim $HOME/.vimkeys.vimrc"
-alias keys="vim $HOME/keys.vimrc"
+alias keys="vim $HOME/.config/nvim/config/keys.vimrc"
 alias shortcuts="vim $HOME/.khdrc"
-alias plug="vim $HOME/plug.vimrc"
+alias plug="vim $HOME/.config/nvim/config/plug.vimrc"
 alias dc=docker-compose
 alias n="nautilus"
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
@@ -49,6 +49,14 @@ alias ptw="ptw -- -x --lf"
 alias tal="cd $HOME/workspace/tal"
 alias dimms="cd $HOME/workspace/s4f-dimension-processor"
 alias sick="cd $HOME/workspace/s4f-sick-integration-service"
+alias dis="cd $HOME/git_repos/distell"
+alias testdjango="find . -name '*.py' | entr python ./manage.py test tests"
+
+restartdjango() {
+  python manage.py makemigrations
+  python manage.py migrate
+  python manage.py runserver
+}
 
 # DIMs
 pushdims() {
