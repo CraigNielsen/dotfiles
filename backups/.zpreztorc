@@ -50,7 +50,8 @@ alias tal="cd $HOME/workspace/tal"
 alias dimms="cd $HOME/workspace/s4f-dimension-processor"
 alias sick="cd $HOME/workspace/s4f-sick-integration-service"
 alias dis="cd $HOME/git_repos/distell"
-alias testdjango="find . -name '*.py' | entr python ./manage.py test tests"
+alias testdjango="find . -name '*.py' | entr python ./manage.py test "
+alias react="cd ~/git_repos/react_native_sandbox/test-app"
 
 restartdjango() {
   python manage.py makemigrations
