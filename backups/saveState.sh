@@ -1,16 +1,6 @@
 #!/bin/zsh
 cd $HOME/git_repos/dotfiles;
 
-if [[ $HOME == '/home/craig' ]]
-then
-  echo "in debian"
-  python saveConfig.py debSave.txt
-elif [[ $HOME == '/Users/craig.ferguson' ]]
-then
-  echo "in mac"
-  python saveConfig.py macSave.txt
-fi
-
 check() {
   print $PWD
   a=$(git status | grep -c "modified")
@@ -23,16 +13,23 @@ check() {
     git push
   fi
 }
+
+if [[ $HOME == '/home/craig' ]]
+then
+  echo "in debian"
+  python saveConfig.py debSave.txt
+elif [[ $HOME == '/Users/craig.ferguson' ]]
+then
+  echo "in mac"
+  python saveConfig.py macSave.txt
+fi
+
 cd $HOME/.idea
 check "pycharm setup"
 echo ''
 #_____
 cd $HOME/.config/nvim/UltiSnips
 check "ultisnips"
-echo ''
-#_____
-cd $HOME/vim_projects
-check 'vim projects'
 echo ''
 #_____
 cd $HOME/.tmuxinator
