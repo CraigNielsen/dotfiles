@@ -5,7 +5,7 @@ if [[ $HOME == '/home/craig' ]]
 then
   echo "in debian"
   python saveConfig.py debSave.txt
-elif [[ $HOME == '/craig.ferguson' ]]
+elif [[ $HOME == '/Users/craig.ferguson' ]]
 then
   echo "in mac"
   python saveConfig.py macSave.txt
@@ -23,8 +23,16 @@ check() {
     git push
   fi
 }
+cd $HOME/.idea
+check "pycharm setup"
+echo ''
+#_____
 cd $HOME/.config/nvim/UltiSnips
 check "ultisnips"
+echo ''
+#_____
+cd $HOME/vim_projects
+check 'vim projects'
 echo ''
 #_____
 cd $HOME/.tmuxinator
