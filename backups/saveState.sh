@@ -24,7 +24,7 @@ then
   python saveConfig.py macSave.txt
 fi
 
-cd $HOME/.idea
+cd $HOME/workspace/tal/.idea
 check "pycharm setup"
 echo ''
 #_____

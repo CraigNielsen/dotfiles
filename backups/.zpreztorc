@@ -8,7 +8,6 @@ export KUBE_UAT_NAMESPACE="wmstesting"
 export KUBE_CRAIG_NAMESPACE="craig"
 export OFFICE="kubectl --context kubernetes-admin@kubernetes"
 export UAT="$OFFICE --namespace wmsuat"
-export WMS388="$OFFICE --namespace wms-388"
 export CK="$OFFICE --namespace $KUBE_CRAIG_NAMESPACE"
 export WMSTESTING="$OFFICE --namespace $KUBE_UAT_NAMESPACE"
 export MASTER="$OFFICE --namespace master"
@@ -44,8 +43,6 @@ alias wmstesting="$WMSTESTING"
 alias ke="kubectl exec -i -t"
 alias ka="kubectl attach -i -t"
 alias office="$OFFICE"
-#currentnamespace=wms-388
-#alias wmsuat="$WMS388"
 alias wmsuat="$UAT"
 currentnamespace=wmsuat
 alias master="$MASTER"
@@ -55,6 +52,8 @@ alias dimms="cd $HOME/workspace/s4f-dimension-processor"
 alias sick="cd $HOME/workspace/s4f-sick-integration-service"
 alias dis="cd $HOME/git_repos/distell"
 alias testdjango="find . -name '*.py' | entr python ./manage.py test "
+alias testsos="find . -name '*.py' | entr pytest $HOME/workspace/s4f-shipping-options-service/shipping_options_service/tests/test_shipping_options_controller.py"
+alias wmsuata="$UAT attach -it "
 
 # DIMs
 dockerbuildpush() {
@@ -78,16 +77,20 @@ rdimstemp() {
   IFS=$'\n'
   #cublogfire=$(kubectl get pod -o name | grep s4f-dimension-processor-cub-logfire-consumer | sed 's/pods\///')
   #cubwms=$(kubectl get pod -o name | grep s4f-dimension-processor-cub-wms | sed 's/pods\///')
-  #dims=$(kubectl get pod -o name | grep s4f-dimension-processor-tsm-consumer| sed 's/pods\///')
-  #dimsisck=$(kubectl get pod -o name | grep s4f-dimension-processor-sick-consumer| sed 's/pods\///')
-  #log=$(kubectl get pod -o name | grep li-cub | sed 's/pods\///')
+  dims=$(kubectl get pod -o name | grep s4f-dimension-processor | sed 's/pods\///')
+  echo $dims | xargs -n1 -P 3 kubectl  delete pod
+  #
+  #log=$(kubectl get pod -o name | grep logfire-integration | sed 's/pods\///')
+  #echo $log
+  #echo $log | xargs -n1 -P 3 kubectl  delete pod
+
   #kubectl delete pod $log --grace-period=0
   #tsm=$(kubectl get pod -o name | grep li-tsm | sed 's/pods\///')
   #kubectl delete pod $tsm --grace-period=0
   #
-  wms=$(kubectl get pod -o name | grep -v s3f | grep wms-service | sed 's/pods\///')
-  echo $wms
-  echo $wms | xargs -n1 -P 3 kubectl  delete pod
+  #wms=$(kubectl get pod -o name | grep -v s3f | grep wms-service | sed 's/pods\///')
+  #echo $wms
+  #echo $wms | xargs -n1 -P 3 kubectl  delete pod
 
   #sleep 2
   #wms=$(kubectl get pod -o name | grep -v s3f | grep wms-service | sed 's/pods\///')
@@ -111,25 +114,33 @@ test() {
 pushswms() {
   md
   here=$(pwd)
-  tag=WMS-3109-V2
-  #tag=WMS-2365
+  #tag=kak
+  tag=WMS-2365
   cd $HOME/workspace/service_wms && docker build -t image-registry.ci.env:80/takealot/service_wms:$tag . && docker push image-registry.ci.env:80/takealot/service_wms:$tag
-  mycons=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace wmsuat get pod -o name | grep s3f-wms-mysql-consumer-cpt | sed 's/pods\///')
+  mycons=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s3f-wms-mysql-consumer-cpt | sed 's/pods\///')
   myconstsin=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s3f-wms-mysql-tsin-consumer-cpt | sed 's/pods\///')
+
   SAVEIFS=$IFS
   IFS=$'\n'
   wms=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s3f-wms-service | sed 's/pods\///')
+
   kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod  $mycons
-  kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod  $myconstsin
+
+  echo $myconstsin | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
   echo $wms | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
   IFS=$SAVEIFS
   cd $here
 }
-
+watchuatrabbitqueues () {
+  rabbit=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep rabbitmq-wms | sed 's/pods\///')
+  kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace exec -it $rabbit -- rabbitmqctl list_queues -p wms
+}
 pushdash() {
   md
   here=$(pwd)
   tag='WMS-388'
+  wms388=('wms-service' 'dashboard' 'submit-po-to-adaptris' 'adaptris-service')
+
   cd $HOME/workspace/tal && docker build -t image-registry.ci.env:80/takealot/tal-with-requirements:$tag . && docker push image-registry.ci.env:80/takealot/tal-with-requirements:$tag
   cd $here
 # Save current IFS
@@ -137,14 +148,34 @@ pushdash() {
 # Change IFS to new line.
   IFS=$'\n'
   wms=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep -v lb | grep dashboard | sed 's/pods\///')
+  submitpo=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep -v lb | grep submit-po-to-adaptris | sed 's/pods\///')
+  adaptris=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep -v lb | grep adaptris-service | sed 's/pods\///')
   echo $wms | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
+  echo $submitpo | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
+  echo $adaptris | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
+# Restore IFS
+  IFS=$SAVEIFS
+  printf "%s\n" "${wms388[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
+}
+pushsick() {
+  md
+  here=$(pwd)
+  tag='WMS-3366'
+  cd $HOME/workspace/s4f-sick-integration-service && docker build -t image-registry.ci.env:80/takealot/s4f-sick-integration-service:$tag . && docker push image-registry.ci.env:80/takealot/s4f-sick-integration-service:$tag
+  cd $here
+# Save current IFS
+  SAVEIFS=$IFS
+# Change IFS to new line.
+  IFS=$'\n'
+  sick=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep sick-client | sed 's/pods\///')
+  echo $sick | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
 # Restore IFS
   IFS=$SAVEIFS
 }
 pushwms() {
   md
   here=$(pwd)
-  tag='WMS-388'
+  tag='WMS-2365'
   cd $HOME/workspace/tal && docker build -t image-registry.ci.env:80/takealot/tal-with-requirements:$tag . && docker push image-registry.ci.env:80/takealot/tal-with-requirements:$tag
   cd $here
 # Save current IFS
@@ -156,10 +187,13 @@ pushwms() {
 # Restore IFS
   IFS=$SAVEIFS
 }
+stagealotcat() {
+  ttab  -t "stagealot" "ssh -t -A toor@stagealot.com  cat /etc/bind/db.stagealot.com | grep  '$1'"
+}
 pushlfi() {
   md
   here=$(pwd)
-  tag='WMS-2859'
+  tag='WMS-2859-craig'
   cd $HOME/workspace/s4f-wms-logfire-integration && docker build -t image-registry.ci.env:80/takealot/s4f-wms-logfire-integration:$tag . && docker push image-registry.ci.env:80/takealot/s4f-wms-logfire-integration:$tag
   cd $here
 # Save current IFS
@@ -174,7 +208,8 @@ pushlfi() {
 pushdims() {
   md
   here=$(pwd)
-  cd $HOME/workspace/s4f-dimension-processor && docker build -t image-registry.ci.env:80/takealot/s4f-dimension-processor:WMS-1910 . && docker push image-registry.ci.env:80/takealot/s4f-dimension-processor:WMS-1910
+  tag='WMS-3009'
+  cd $HOME/workspace/s4f-dimension-processor && docker build -t image-registry.ci.env:80/takealot/s4f-dimension-processor:$tag . && docker push image-registry.ci.env:80/takealot/s4f-dimension-processor:$tag
   cd $here
   wms=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s4f-dimension-processor-cub-wms | sed 's/pods\///')
   cub=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s4f-dimension-processor-cub-logfire | sed 's/pods\///')
@@ -189,17 +224,17 @@ add_sftp_file_uat() {
   here=$(pwd)
   cd $HOME/workspace/cdev/helpers/sftp
   #python uat_sftp_client.py
-  python local_sftp_client.py
+  python sftp_adder.py
   cd $here
 }
-add_local_cub() {
+add_sftp_files() {
   #log=$(kubectl get pod -o name | grep -v Term | grep logfire-integration-cub | sed 's/pods\///')
   #echo $log
   #kubectl delete pod $log
   #sleep 2
-  log=$(kubectl get pod -o name | grep -v Term | grep li-cub | sed 's/pods\///')
+  log=$(kubectl get pod -o name | grep logfire-integration-cub | sed 's/pods\///')
   echo $log
-  kubectl exec -it $log python local_sftp_client.py
+  kubectl exec -it $log python sftp_adder.py
 }
 add_sftp_iht() {
   here=$(pwd)
@@ -209,7 +244,11 @@ add_sftp_iht() {
 }
 
 hiuat() {
-  helm upgrade --install $1 --kube-context kubernetes-admin@kubernetes  $2 --namespace $currentnamespace --set image.pullPolicy=Always,image.tag=master
+  #tag='WMS-3009'
+  local tag=`git rev-parse --abbrev-ref HEAD`
+  #tag='master'
+  echo 'installing tag '$tag
+  helm upgrade --install $1 --kube-context kubernetes-admin@kubernetes  $2 --namespace $currentnamespace --set image.pullPolicy=Always,image.tag=$tag
 }
 hduat() {
   helm del --purge --kube-context kubernetes-admin@kubernetes $1
@@ -217,19 +256,21 @@ hduat() {
 huatls() {
   helm --kube-context kubernetes-admin@kubernetes --namespace $currentnamespace ls
 }
+hmasterls() {
+  helm --kube-context kubernetes-admin@kubernetes --namespace master ls
+}
 
 alias hwms="helm upgrade --install wms-service ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=master,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
 alias hdash="helm upgrade --install dash charts/dashboard --set dashboard.dev.patch=false,dashboardLb.dev.patch=true,dashboard.dev.hostPath=$HOME/workspace/tal/tal,dashboardLb.dev.hostPath=$HOME/workspace/tal/tal/services/dashboard/static,dashboard.image.tag=WMS-388"
 alias hsos="helm upgrade --install sos $OS/workspace/s4f-shipping-options-service/charts/s4f-shipping-options-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-shipping-options-service/shipping_options_service,dev.mountPath=/usr/local/tal/s4f-shipping-options-service/shipping_options_service,image.tag=WMS-3015,resources.requests.cpu=300m,resources.limits.cpu=330"
-alias hdims="helm upgrade --install dims $OS/workspace/s4f-dimension-processor/charts/s4f-dimension-processor --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-dimension-processor,dev.mountPath=/usr/local/tal/s4f-dimension-processor,image.tag=WMS-1910,resources.requests.cpu=300m,resources.limits.cpu=330"
+alias hdims="helm upgrade --install dimms $OS/workspace/s4f-dimension-processor/charts/s4f-dimension-processor --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-dimension-processor,dev.mountPath=/usr/local/tal/s4f-dimension-processor,image.tag=WMS-1910,resources.requests.cpu=300m,resources.limits.cpu=330"
 alias hlfi="helm upgrade --install lfi $OS/workspace/s4f-wms-logfire-integration/charts/s4f-wms-logfire-integration --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-wms-logfire-integration,dev.mountPath=/usr/local/tal/s4f-wms-logfire-integration,image.tag=WMS-2859,resources.requests.cpu=300m,resources.limits.cpu=330"
 alias hswms="helm upgrade --install service-wmsm ~/workspace/service_wms/charts/s3f-wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/service_wms,resources.requests.cpu=400m,resources.limits.cpu=430 "
 alias hswms_sftp_consumers="helm upgrade --install swms-sftp-cons ~/workspace/service_wms/charts/s3f-wms-sftp-consumers/ --set image.pullPolicy=IfNotPresent,dev.patch=true,image.tag=WMS-2365,dev.hostPath=$OS/workspace/service_wms,resources.requests.cpu=400m,resources.limits.cpu=430 "
-alias hsick="helm upgrade --install sick-service $HOME/workspace/s4f-sick-integration-service/charts/s4f-sick-integration-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-sick-integration-service,dev.hostPath=$HOME/workspace/s4f-sick-integration-service,resources.requests.cpu=300m,resources.limits.cpu=330"
+alias hsick="helm upgrade --install sick-service $HOME/workspace/s4f-sick-integration-service/charts/s4f-sick-integration-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-sick-integration-service,dev.hostPath=$HOME/workspace/s4f-sick-integration-service,resources.requests.cpu=300m,resources.limits.cpu=330,image.tag=WMS-3366"
 alias htimer="helm upgrade --install s4f-timer-service ~/workspace/s4f-timer-service/charts/s4f-timer-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-timer-service,dev.hostPath=`pwd`/workspace/s4f-timer-service,resources.requests.cpu=300m,resources.limits.cpu=330 "
 alias horders="helm upgrade --install order-service ~/workspace/tal/charts/order-service --set image.pullPolicy=Always,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,resources.requests.cpu=300m,resources.limits.cpu=330 "
 alias hcomms="helm upgrade --install comms ~/workspace/s4f-comms-service/charts/s4f-comms-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-comms-service/comms_service,dev.hostPath=$HOME/workspace/s4f-comms-service/comms_service,resources.requests.cpu=300m,resources.limits.cpu=330 "
-alias wmsuatimages="echo wms-service && wmsuat describe deployment wms-service | grep image && echo dashboard && wmsuat describe deployment dashboard | grep image"
 alias hdel='helm del --purge'
 #watch network
 alias watchnet="watch -n 1 'sudo netstat -tanop'"
@@ -246,6 +287,48 @@ fucksky() {
 hsftp() {
  cd /Users/craig.ferguson/workspace/cdev/kube/deployments
  kubectl create -f sftp
+}
+wmsuatimages() {
+
+  wms388=('wms-service' 'dashboard' 'submit-po-to-adaptris' 'adaptris-service')
+  wms2365=('s3f-wms-service' 's3f-wms-mysql-consumer-cpt' 's3f-wms-mysql-tsin-consumer-cpt' 'wms-service')
+  wms3009=('s4f-dimension-processor' )
+  wms3366=('s4f-dimension-processor' 's4f-sick-client-cpt-inline-01' 'logfire-integration')
+  #for i in $services; do
+    #echo $i;
+    #echo $i;
+  #done
+  echo "388 User logging"
+  printf "%s\n" "${wms388[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
+  echo ''
+
+  echo "2365 Voetstoets"
+  printf "%s\n" "${wms2365[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
+  echo ''
+
+  echo "3009 Dimensions Consumers"
+  printf "%s\n" "${wms3009[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
+  echo ''
+
+  echo "3366 Sick Integration 3009 dims logfire int 2859"
+  printf "%s\n" "${wms3366[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
+  echo ''
+
+}
+wmsuatrestart() {
+
+  SAVEIFS=$IFS
+  IFS=$'\n'
+
+  services=('wms-service' 'dashboard' 's3f-wms-service', 'submit-po-to-adaptris', 'adaptris-service')
+
+  for i in $services; do
+    wms=$(kubectl --context kubernetes-admin@kubernetes --namespace wmsuat get pods -o name | grep -v s3f | grep $i | sed 's/pods\///')
+    echo $wms | xargs -I % sh -c '$UAT delete pod % '
+  done
+
+  IFS=$SAVEIFS
+
 }
 #watching kubes
 #alias watch1="$HOME/workspace/cdev/kube/watch_kube.py kubectl"
@@ -467,6 +550,9 @@ eval "$(pyenv virtualenv-init -)"
 setopt correct
 unsetopt correctall
 
+wmsuate() {
+    kubectl --context kubernetes-admin@kubernetes --namespace wmsuat exec -i -t $1 bash
+}
 pep() {
     kubectl --context production exec -i -t $1 bash
 }
@@ -503,9 +589,14 @@ krun() {
   k run my-shell --rm -i --tty --image 10.4.1.39:5000/takealot/warehouse_pack:master -- bash -c " pip install pudb;export ROLE=KUBERNETES;export ENVIRONMENT=STAGING; kafka_consumer --consumer_type tsin_dimensions_sftp
 "
 }
+prodkrun() {
+
+}
+#krun2() {
+  #kubectl --context production exec -i --tty $1 -- bash -c "kafka_consumer --consumer_type tsin_dimensions_sftp"
+#}
 krun2() {
-  k exec -i --tty $1 -- bash -c "kafka_consumer --consumer_type tsin_dimensions_sftp
-"
+  k exec -i --tty $1 -- bash -c "kafka_consumer --consumer_type tsin_dimensions_sftp"
 }
 gac() {
   git add .
@@ -564,7 +655,8 @@ TESTD() {
 TESTsos() {
   NAME=$(kubectl get pod -o name | grep shipping | sed 's/pods\///')
   kubectl exec  $NAME -- bash -c "pip install pytest unittest2 mock"
-  kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_utils.py"
+  kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_shipping_options_controller.py"
+  find . -name '*.py' | entr kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_shipping_options_controller.py"
 }
 TESTdims() {
   NAME=$(kubectl get pod -o name | grep processor-sick-consumer | sed 's/pods\///')
@@ -582,6 +674,7 @@ TESTwmsapi() {
   read -r NAME <<< "$NAMES"
   kubectl exec  $NAME -- bash -c "pip install pytest pudb"
   kubectl exec  $NAME -- bash -c "pytest -s tal/services/wms/test/test_wms_AuditLogger.py"
+  #kubectl exec  $NAME -- bash -c "pytest -s tal/services/outbound_orders/test/test_inbound_auto_ibt.py"
   IFS=$SAVEIFS
 }
 TESTMR() {
@@ -680,7 +773,7 @@ grep_wmsapi02() {
   ttab  -t "WMSAPI02" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh wmsapi02 'cat /var/log/supervisor/services.wms.error.log*'\" | grep '$1'"
 }
 grep_wmsapi03() {
-  ttab  -t "WMSAPI03" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh wmsapi03 'cat /var/log/supervisor/services.wms.error.log*'\" | grep '$1'"
+  ttab  -t "WMSAPI03" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh wmsapi03 'cat /var/log/supervisor/services.wms.error.log*'\" | grep -B 10 -A 10 '$1'"
 }
 grep_wmsapi05() {
   ttab  -t "WMSAPI05" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh wmsapi05 'cat /var/log/supervisor/services.wms.error.log*'\" | grep '$1'"
@@ -766,10 +859,10 @@ run_on_wmsapi02() {
 retry_failed_order_injections() {
     ttab  -t "retry oi" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh toor@wmsapi02 'export ROLE=DC;source /usr/local/tal/tal/venv/bin/activate; export PYTHONPATH=/usr/local/tal/tal; python /usr/local/tal/tal/tal/services/outbound_orders/bin/retry_failed_order_injections.py'\" "
 }
-timeoutPO_wmsapi02() {
+POtimeout_wmsapi02() {
     ttab  -t "po timeout oi" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh toor@wmsapi02 'export ROLE=DC;source /usr/local/tal/tal/venv/bin/activate; export PYTHONPATH=/usr/local/tal/tal; python /usr/local/tal/tal/tal/services/adaptris/bin/manually_approve_and_submit_po.py -i $1'\" "
 }
-timeoutPO_E_wmsapi02() {
+POtimeout_E_wmsapi02() {
     ttab  -t "po timeout oi" "ssh -t -A craigferguson@jump-box.takealot.com \"ssh toor@wmsapi02 'export ROLE=DC;source /usr/local/tal/tal/venv/bin/activate; export PYTHONPATH=/usr/local/tal/tal; python /usr/local/tal/tal/tal/services/adaptris/bin/manually_approve_and_submit_po.py -i $1 -e'\" "
 }
 run_on_wms() {
