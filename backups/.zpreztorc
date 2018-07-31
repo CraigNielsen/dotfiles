@@ -38,6 +38,7 @@ alias plug="vim $HOME/plug.vimrc"
 alias dc=docker-compose
 alias n="nautilus"
 alias sos='cd ~/workspace/s4f-shipping-options-service'
+alias lfi='cd ~/workspace/s4f-wms-logfire-integration'
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
 #
 #alias officek='kubectl --context staging'
@@ -88,25 +89,26 @@ kk() {
   #dims=$(kubectl get pod -o name | grep s4f-dimension-processor | sed 's/pods\///')
   #echo $dims | xargs -n1 -P 3 kubectl  delete pod
   #wms=$(kubectl get pod -o name | grep wms-serivce | sed 's/pods\///')
-  #wms=$(kubectl get pod -o name | grep wms-serivce | sed 's/pods\///')
-  #echo $dims | xargs -n1 -P 3 kubectl  delete pod
+  wms=$(kubectl get pod -o name | grep wms-serivce | sed 's/pods\///')
+  echo $dims | xargs -n1 -P 3 kubectl  delete pod
   #
   #log=$(kubectl get pod -o name | grep logfire-integration | sed 's/pods\///')
   #echo $log
   #echo $log | xargs -n1 -P 3 kubectl  delete pod
 
-  ship=$(kubectl get pod -o name | grep shipping-option | sed 's/pods\///')
-  kubectl delete pod $ship --grace-period=0
+  #ship=$(kubectl get pod -o name | grep shipping-option | sed 's/pods\///')
+  #kubectl delete pod $ship --grace-period=0
   #
   #kubectl delete pod $log --grace-period=0
   #tsm=$(kubectl get pod -o name | grep li-tsm | sed 's/pods\///')
   #kubectl delete pod $tsm --grace-period=0
   #
+  tdt=$(kubectl get pod -o name | grep tdt | sed 's/pods\///')
+  echo $tdt | xargs -n1 -P 3 kubectl  delete pod
   #dash=$(kubectl get pod -o name | grep dashboard | sed 's/pods\///')
   #echo $dash | xargs -n1 -P 3 kubectl  delete pod
-  wms=$(kubectl get pod -o name | grep -v s3f | grep wms-service | sed 's/pods\///')
-  echo $wms
-  echo $wms | xargs -n1 -P 3 kubectl  delete pod
+  #wms=$(kubectl get pod -o name | grep -v s3f | grep wms-service | sed 's/pods\///')
+  #echo $wms | xargs -n1 -p 3 kubectl  delete pod
 
   #sleep 2
   #wms=$(kubectl get pod -o name | grep -v s3f | grep wms-service | sed 's/pods\///')
@@ -348,8 +350,9 @@ hmasterls() {
 dimstag=WMS-3589
 
 alias hwms="helm upgrade --install wms-service ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=master,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
+alias hshipwms="helm upgrade --install wms-shipping-service ~/workspace/tal/charts/wms-shipping-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=master,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
 alias hdash="helm upgrade --install dash charts/dashboard --set dashboard.dev.patch=true,dashboardLb.dev.patch=true,dashboard.dev.hostPath=$HOME/workspace/tal,dashboardLb.dev.hostPath=$HOME/workspace/tal/tal/services/dashboard/static,dashboard.image.tag=master"
-sostag='WMS-3524'
+sostag='WMS-3324'
 alias hsos="helm upgrade --install sos $OS/workspace/s4f-shipping-options-service/charts/s4f-shipping-options-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-shipping-options-service/shipping_options_service,dev.mountPath=/usr/local/tal/s4f-shipping-options-service/shipping_options_service,image.tag=$sostag,resources.requests.cpu=300m,resources.limits.cpu=330"
 alias hdims="helm upgrade --install dimms $OS/workspace/s4f-dimension-processor/charts/s4f-dimension-processor --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-dimension-processor,dev.mountPath=/usr/local/tal/s4f-dimension-processor,image.tag=$dimstag,resources.requests.cpu=300m,resources.limits.cpu=330"
 alias hlfi="helm upgrade --install lfi $OS/workspace/s4f-wms-logfire-integration/charts/s4f-wms-logfire-integration --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-wms-logfire-integration,dev.mountPath=/usr/local/tal/s4f-wms-logfire-integration,image.tag=WMS-2859,resources.requests.cpu=300m,resources.limits.cpu=330"
@@ -393,32 +396,42 @@ wmsuatupdatetags() {
   echo ''
 
 }
+
 wmsuatimages() {
 
-  #wms388=('wms-service' 'dashboard' 'submit-po-to-adaptris' 'adaptris-service')
-  wms3598=('wms-service' 'dashboard')
+  wms3769=('s4f-dimension-processor' 'wms-service')
+  wms3765=('wms-service' 'dashboard')
+  wms3329=('wms-service' 'tdt-integration-service')
   wms2365=('s3f-wms-service' 's3f-wms-mysql-consumer-cpt' 's3f-wms-mysql-tsin-consumer-cpt' 'wms-service')
   wms3009=('s4f-dimension-processor' )
-  wms3366=('s4f-dimension-processor' 's4f-sick-client-cpt-inline-01' 's4f-dimension-processor-cub-logfire-consumer' 's4f-wms-logfire-integration-cub-poller-cpt' 's4f-wms-logfire-integration-cub-poller-jhb' 's4f-wms-logfire-integration-sic-poller-cpt' 's4f-wms-logfire-integration-sic-poller-jhb' 's4f-wms-logfire-integration-tsm-poller-cpt' 's4f-wms-logfire-integration-tsm-poller-jhb')
-  #for i in $services; do
-    #echo $i;
-    #echo $i;
-  #done
-  #echo "388 User logging"
-  #printf "%s\n" "${wms388[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  #wms3366=('s4f-dimension-processor' 's4f-sick-client-cpt-inline-01' 's4f-dimension-processor-cub-logfire-consumer' 's4f-wms-logfire-integration-cub-poller-cpt' 's4f-wms-logfire-integration-cub-poller-jhb' 's4f-wms-logfire-integration-sic-poller-cpt' 's4f-wms-logfire-integration-sic-poller-jhb' 's4f-wms-logfire-integration-tsm-poller-cpt' 's4f-wms-logfire-integration-tsm-poller-jhb')
+  wms3366=('s4f-dimension-processor' 's4f-sick-client-cpt-inline-01' 's4f-wms-logfire-integration-sic-poller-cpt' 's4f-wms-logfire-integration-sic-poller-jhb')
+
+  echo "3769 move cub message to consumer and out of dimension processor"
+  echo "https://jira.takealot.com/jira/browse/WMS-3769"
+  printf "%s\n" "${wms3769[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  echo ''
+
+  echo "3765 Add repack button to dashboard"
+  echo "https://jira.takealot.com/jira/browse/WMS-3765"
+  echo "https://github.com/TAKEALOT/tal/pull/7707"
+  printf "%s\n" "${wms3765[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  echo ''
+
+  echo "3329 Order Injections DOP"
+  echo "https://jira.takealot.com/jira/browse/WMS-3329"
+  echo "https://github.com/TAKEALOT/tal/pull/7711 WMS-3329"
+  echo "https://github.com/TAKEALOT/tdt-integration-service/pull/2"
+  printf "%s\n" "${wms3329[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  echo ''
+
+  #echo "2365 Voetstoets"
+  #printf "%s\n" "${wms2365[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
   #echo ''
 
-  echo "3598 Dashboard retry sick"
-  printf "%s\n" "${wms3598[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
-  echo ''
-
-  echo "2365 Voetstoets"
-  printf "%s\n" "${wms2365[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
-  echo ''
-
-  echo "3009 Dimensions Consumers"
-  printf "%s\n" "${wms3009[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
-  echo ''
+  #echo "3009 Dimensions Consumers"
+  #printf "%s\n" "${wms3009[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  #echo ''
 
   echo "3366 Sick Integration 3009 dims logfire int 2859"
   printf "%s\n" "${wms3366[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
@@ -791,7 +804,7 @@ TESTD() {
   kubectl exec -i -t $NAME -- bash -c "cd dimension_processor/tests;pytest -s -x --lf test_dimension_processor.py"
 }
 testtdt() {
-
+  cd $HOME/workspace/tdt-integration-service
   NAMES=$(kubectl get pod -o name | grep tdt-integration-service  | sed 's/pods\///')
   read -r NAME <<< "$NAMES"
    echo $NAME
@@ -824,7 +837,9 @@ testwms() {
   #NAME=$($namespace_command get pod -o name | grep wms-service | sed 's/pods\///')
   kubectl exec  $NAME -- bash -c "pip install pytest unittest2 mock"
   #kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_service_endpoints.py"
-  find . -name '*.py' | entr kubectl exec  $NAME --  bash -c "pytest -s tal/services/wms/test/test_shipping_queue_utilities.py"
+  #find . -name '*.py' | entr kubectl exec  $NAME --  bash -c "pytest -s tal/services/wms/test/test_shipping_queue_utilities.py"
+# move order injections out of tal:
+  find . -name '*.py' | entr kubectl exec  $NAME --  bash -c "pytest -s tal/services/wms/test/test_wms_client.py"
   IFS=$SAVEIFS
 }
 testsos() {
@@ -1242,3 +1257,9 @@ catdifffile() {
 source $HOME/git_repos/craig_help/networks/networkrc
 alias enetworks='vim $HOME/git_repos/craig_help/networks/networkrc'
 
+#_________RECENT___________________
+add_function() {
+  func=$(tail -n 2 $HOME/.zhistory)
+  read -r NAME <<< "$func"
+  echo $read | xargs -n1 echo
+}
