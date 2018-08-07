@@ -86,12 +86,13 @@ kk() {
   IFS=$'\n'
   #cublogfire=$(kubectl get pod -o name | grep s4f-dimension-processor-cub-logfire-consumer | sed 's/pods\///')
   #cubwms=$(kubectl get pod -o name | grep s4f-dimension-processor-cub-wms | sed 's/pods\///')
+  #
   #dims=$(kubectl get pod -o name | grep s4f-dimension-processor | sed 's/pods\///')
   #echo $dims | xargs -n1 -P 3 kubectl  delete pod
-  #wms=$(kubectl get pod -o name | grep wms-serivce | sed 's/pods\///')
-  wms=$(kubectl get pod -o name | grep wms-serivce | sed 's/pods\///')
-  echo $dims | xargs -n1 -P 3 kubectl  delete pod
-  #
+
+  #wms=$(kubectl get pod -o name | grep wms-service | sed 's/pods\///')
+  #echo $wms | xargs -n1 -P 3 kubectl  delete pod
+
   #log=$(kubectl get pod -o name | grep logfire-integration | sed 's/pods\///')
   #echo $log
   #echo $log | xargs -n1 -P 3 kubectl  delete pod
@@ -100,13 +101,16 @@ kk() {
   #kubectl delete pod $ship --grace-period=0
   #
   #kubectl delete pod $log --grace-period=0
+
   #tsm=$(kubectl get pod -o name | grep li-tsm | sed 's/pods\///')
   #kubectl delete pod $tsm --grace-period=0
-  #
+
   tdt=$(kubectl get pod -o name | grep tdt | sed 's/pods\///')
   echo $tdt | xargs -n1 -P 3 kubectl  delete pod
+
   #dash=$(kubectl get pod -o name | grep dashboard | sed 's/pods\///')
   #echo $dash | xargs -n1 -P 3 kubectl  delete pod
+
   #wms=$(kubectl get pod -o name | grep -v s3f | grep wms-service | sed 's/pods\///')
   #echo $wms | xargs -n1 -p 3 kubectl  delete pod
 
@@ -125,13 +129,9 @@ kk() {
   #kubectl delete pod $cublogfire
   #kubectl delete pod $cubwms
 }
-test() {
-  someting=$(kubectl --context staging get pods --namespace $currentnamespace)
-  echo $someting
-}
+# ______________________________________________________________________________
 pushswms() {
   md
-  here=$(pwd)
   #tag=kak
   tag=WMS-2365
   cd $HOME/workspace/service_wms && docker build -t image-registry.ci.env:80/takealot/service_wms:$tag . && docker push image-registry.ci.env:80/takealot/service_wms:$tag
@@ -147,7 +147,6 @@ pushswms() {
   echo $myconstsin | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
   echo $wms | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
   IFS=$SAVEIFS
-  cd $here
 }
 watchuatrabbitqueues () {
   rabbit=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep rabbitmq-wms | sed 's/pods\///')
@@ -155,14 +154,12 @@ watchuatrabbitqueues () {
 }
 pushdash() {
   md
-  here=$(pwd)
   #tag='WMS-3598'
   tag='WMS-3589' # update orderitem on dashboard parcel management
   #wms388=('wms-service' 'dashboard' 'submit-po-to-adaptris' 'adaptris-service')
   wms3598=('wms-service' 'dashboard')
 
   cd $HOME/workspace/tal && docker build -t image-registry.ci.env:80/takealot/tal-with-requirements:$tag . && docker push image-registry.ci.env:80/takealot/tal-with-requirements:$tag
-  cd $here
 # Save current IFS
   SAVEIFS=$IFS
 # Change IFS to new line.
@@ -182,10 +179,8 @@ pushdash() {
 }
 pushsick() {
   md
-  here=$(pwd)
   tag='WMS-3366'
   cd $HOME/workspace/s4f-sick-integration-service && docker build -t image-registry.ci.env:80/takealot/s4f-sick-integration-service:$tag . && docker push image-registry.ci.env:80/takealot/s4f-sick-integration-service:$tag
-  cd $here
 # Save current IFS
   SAVEIFS=$IFS
 # Change IFS to new line.
@@ -195,12 +190,11 @@ pushsick() {
 # Restore IFS
   IFS=$SAVEIFS
 }
+# _________________________________________________________________________________
 pushtdt() {
   md
-  here=$(pwd)
   tag='WMS-3329'
   cd $HOME/workspace/tdt-integration-service/tdt-integration-service && docker build -t image-registry.ci.env:80/takealot/tdt-integration-service:$tag . && docker push image-registry.ci.env:80/takealot/tdt-integration-service:$tag
-  cd $here
 # Save current IFS
   SAVEIFS=$IFS
 # Change IFS to new line.
@@ -227,10 +221,10 @@ pushsos() {
 }
 pushwms() {
   md
-  here=$(pwd)
-  tag='WMS-3646'
+  #tag='WMS-3646'
+  #tag='WMS-3784'
+  tag=$dimstag
   cd $HOME/workspace/tal && docker build -t image-registry.ci.env:80/takealot/tal-with-requirements:$tag . && docker push image-registry.ci.env:80/takealot/tal-with-requirements:$tag
-  cd $here
 # Save current IFS
   SAVEIFS=$IFS
 # Change IFS to new line.
@@ -294,6 +288,9 @@ pushdims() {
 view_uat_kafka() {
   ssh toor@kafka02.stagealot.com /opt/kafka/bin/kafka-topics.sh --list --zookeeper 10.4.1.80:2181
 }
+kafka_view_uat_topic() {
+  ssh toor@kafka02.stagealot.com /opt/kafka/bin/kafka-console-consumer.sh --topic $1 --zookeeper 10.4.1.80:2181
+}
 view_uat_kafka_pack() {
   ssh toor@kafka02.stagealot.com /opt/kafka/bin/kafka-console-consumer.sh --topic warehouse_pack --zookeeper 10.4.1.80:2181
 }
@@ -331,9 +328,10 @@ add_sftp_iht() {
 
 hiuat() {
   #tag='WMS-3009'
-  local tag=`git rev-parse --abbrev-ref HEAD`
+  #local tag=`git rev-parse --abbrev-ref HEAD`
   #local tag='WMS-388'
   #tag='master'
+  tag=$dimstag
   echo 'installing tag '$tag
   helm upgrade --install $1 --kube-context staging  $2 --namespace $currentnamespace --set image.pullPolicy=Always,image.tag=$tag
 }
@@ -347,9 +345,9 @@ hmasterls() {
   helm --kube-context staging --namespace master ls
 }
 
-dimstag=WMS-3589
+dimstag=WMS-3787
 
-alias hwms="helm upgrade --install wms-service ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=master,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
+alias hwms="helm upgrade --install wms ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=WMS-3787,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
 alias hshipwms="helm upgrade --install wms-shipping-service ~/workspace/tal/charts/wms-shipping-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=master,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
 alias hdash="helm upgrade --install dash charts/dashboard --set dashboard.dev.patch=true,dashboardLb.dev.patch=true,dashboard.dev.hostPath=$HOME/workspace/tal,dashboardLb.dev.hostPath=$HOME/workspace/tal/tal/services/dashboard/static,dashboard.image.tag=master"
 sostag='WMS-3324'
@@ -366,7 +364,7 @@ alias hdel='helm del --purge'
 htdt () {
   tag='WMS-3329'
   cd ~/workspace/tdt-integration-service/tdt-integration-service
-  helm upgrade --install tdt --set dev.patch=true,dev.hostPath=$PWD,image.tag=$tag charts/tdt-integration-service
+  helm upgrade --install tdt --set dev.patch=true,dev.hostPath=$PWD/tdt_integration_service,image.tag=$tag charts/tdt-integration-service
 }
 generate_proto_tdt() {
   /Users/craig.ferguson/workspace/tdt-integration-service/scripts/generate_proto.sh
@@ -383,6 +381,9 @@ alias resumekube='~/workspace/tal-kubernetes/bin/resume-minikube.sh'
 fucksky() {
   sky=$(kubectl get pod --namespace kube-system -o name | grep skywriter  | sed 's/pods\///')
   kubectl delete pod --namespace kube-system $sky
+}
+fuckpycache() {
+  sudo rm -rf .pytest_cache
 }
 hsftp() {
  cd /Users/craig.ferguson/workspace/cdev/kube/deployments
@@ -401,18 +402,22 @@ wmsuatimages() {
 
   wms3769=('s4f-dimension-processor' 'wms-service')
   wms3765=('wms-service' 'dashboard')
+  wms3787=('wms-service' 'dashboard' 's4f-dimension-processor')
+  wms3589=('wms-service' 'dashboard' 's4f-dimension-processor')
   wms3329=('wms-service' 'tdt-integration-service')
   wms2365=('s3f-wms-service' 's3f-wms-mysql-consumer-cpt' 's3f-wms-mysql-tsin-consumer-cpt' 'wms-service')
-  wms3009=('s4f-dimension-processor' )
+
   #wms3366=('s4f-dimension-processor' 's4f-sick-client-cpt-inline-01' 's4f-dimension-processor-cub-logfire-consumer' 's4f-wms-logfire-integration-cub-poller-cpt' 's4f-wms-logfire-integration-cub-poller-jhb' 's4f-wms-logfire-integration-sic-poller-cpt' 's4f-wms-logfire-integration-sic-poller-jhb' 's4f-wms-logfire-integration-tsm-poller-cpt' 's4f-wms-logfire-integration-tsm-poller-jhb')
   wms3366=('s4f-dimension-processor' 's4f-sick-client-cpt-inline-01' 's4f-wms-logfire-integration-sic-poller-cpt' 's4f-wms-logfire-integration-sic-poller-jhb')
+
 
   echo "3769 move cub message to consumer and out of dimension processor"
   echo "https://jira.takealot.com/jira/browse/WMS-3769"
   printf "%s\n" "${wms3769[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
   echo ''
 
-  echo "3765 Add repack button to dashboard"
+
+  echo "3765 Add repack button to dashboard for when messages fail into wmsapi"
   echo "https://jira.takealot.com/jira/browse/WMS-3765"
   echo "https://github.com/TAKEALOT/tal/pull/7707"
   printf "%s\n" "${wms3765[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
@@ -429,14 +434,22 @@ wmsuatimages() {
   #printf "%s\n" "${wms2365[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
   #echo ''
 
-  #echo "3009 Dimensions Consumers"
-  #printf "%s\n" "${wms3009[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
-  #echo ''
-
   echo "3366 Sick Integration 3009 dims logfire int 2859"
   printf "%s\n" "${wms3366[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
   echo ''
 
+  echo  "Update OrderItems directly in field on dashboard, TESTED DEPLOY"
+  echo "3589 need to do a check for the order items"
+  echo "https://jira.takealot.com/jira/browse/WMS-3589"
+  echo "https://github.com/TAKEALOT/tal/pull/7691/files"
+  printf "%s\n" "${wms3589[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  echo ''
+
+
+  echo "3787 retries for pack using event type, TESTED DEPLOY"
+  echo "https://jira.takealot.com/jira/browse/WMS-3787"
+  printf "%s\n" "${wms3787[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  echo ''
 }
 #mongo_prod_query() {
     #ssh -A craigferguson@jump-box.takealot.com
@@ -651,8 +664,8 @@ alias rec="/home/craig/git_repos/receipts/receipts_server"
 alias kaf="cd $HOME/git_repos/kafka/code;"
 
 alias k="kubectl"
+alias khsetup="source <(helm completion zsh)"
 alias ksetup="source <(kubectl completion zsh)"
-alias ksetup="source <(helm completion zsh)"
 alias kc="kubectl create"
 alias kgp="kubectl get pods -owide --all-namespaces --show-all"
 alias pgp="kubectl --context production get pods -owide --all-namespaces --show-all"
@@ -1254,10 +1267,19 @@ catdifffile() {
  zstyle ':prezto:module:tmux:session' name 'CraigSession'
 
 #__________NETWORKS_________________
-source $HOME/git_repos/craig_help/networks/networkrc
-alias enetworks='vim $HOME/git_repos/craig_help/networks/networkrc'
+source $HOME/git_repos/craig_help/wiki_terminal/networkrc
+source $HOME/git_repos/craig_help/wiki_terminal/https
+source $HOME/git_repos/craig_help/wiki_terminal/processes_and_jobs
+source $HOME/git_repos/craig_help/wiki_terminal/files_permissions
+source $HOME/git_repos/craig_help/wiki_terminal/linux_environment_etc
+alias ewiki_networks='vim $HOME/git_repos/craig_help/wiki_terminal/networkrc'
+alias ewiki_https='vim $HOME/git_repos/craig_help/wiki_terminal/https'
+alias ewiki_processes_jobs='vim $HOME/git_repos/craig_help/wiki_terminal/processes_and_jobs'
+alias ewiki_file_permissions='vim $HOME/git_repos/craig_help/wiki_terminal/files_permissions'
+alias ewiki_file_permissions='vim $HOME/git_repos/craig_help/wiki_terminal/linux_environment_etc'
 
 #_________RECENT___________________
+# add the last command to a function wip
 add_function() {
   func=$(tail -n 2 $HOME/.zhistory)
   read -r NAME <<< "$func"
