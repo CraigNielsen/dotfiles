@@ -1,5 +1,6 @@
 # If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+#permenently activate conda
+export PATH=$HOME/bin:/usr/local/bin:$PATH
 export TERM="xterm-256color"
 export CURRENTPROJECT="$HOME/workspace/tal/tal/services/mrd_integration/"
 export OS='/Users/craig.ferguson'
@@ -11,7 +12,7 @@ export UAT="$OFFICE --namespace wmsuat"
 export CK="$OFFICE --namespace $KUBE_CRAIG_NAMESPACE"
 export WMSTESTING="$OFFICE --namespace $KUBE_UAT_NAMESPACE"
 export MASTER="$OFFICE --namespace master"
-export PIP_REQUIRE_VIRTUALENV=true
+export PIP_REQUIRE_VIRTUALENV=false
 export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
 export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
 export CP=$HOME/workspace/cdev/kube/deployments
@@ -55,10 +56,22 @@ alias testdjango="find . -name '*.py' | entr python ./manage.py test "
 alias testsos="find . -name '*.py' | entr pytest $HOME/workspace/s4f-shipping-options-service/shipping_options_service/tests/test_shipping_options_controller.py"
 alias wmsuata="$UAT attach -it "
 
+prox() {
+  cd $HOME/git_repos/reverseproxy
+  pyenv activate roomates
+}
+
+encrypt() {
+  htpasswd -nb $1 $2
+}
 # DIMs
 dockerbuildpush() {
   docker build -t $1 .
   docker push $1
+}
+econda() {
+  export PATH="/home/craig/anaconda3/bin:$PATH"
+  source activate gis
 }
 
 kewms() {
@@ -243,6 +256,9 @@ add_sftp_iht() {
   cd $here
 }
 
+login_to_postgis() {
+  sudo -u postgres psql
+}
 hiuat() {
   #tag='WMS-3009'
   local tag=`git rev-parse --abbrev-ref HEAD`
@@ -652,6 +668,10 @@ TESTD() {
   kubectl exec  $NAME -- bash -c "pip install pytest pudb unittest2 mock"
   kubectl exec -i -t $NAME -- bash -c "cd dimension_processor/tests;pytest -s -x --lf test_dimension_processor.py"
 }
+scrape() {
+  cd ~/git_repos/gumtree-scraper
+  find . -name '*.py' | entr python main.py
+}
 TESTsos() {
   NAME=$(kubectl get pod -o name | grep shipping | sed 's/pods\///')
   kubectl exec  $NAME -- bash -c "pip install pytest unittest2 mock"
@@ -666,6 +686,12 @@ TESTdims() {
 TESTlfi() {
   cd $HOME/workspace/s4f-wms-logfire-integration;
   find . -name '*.py' | entr /Users/craig.ferguson/workspace/cdev/helpers/TESTWmsLogfire.sh
+}
+testgis() {
+  source activate gis
+  which python
+  cd $HOME/git_repos/data-science/intro_to_python_gis
+  find . -name '*.py' | entr pytest -s $HOME/git_repos/data-science/intro_to_python_gis/tests/test_data_queries.py
 }
 TESTwmsapi() {
   SAVEIFS=$IFS
@@ -909,6 +935,43 @@ catdifffile() {
   cat diffs| awk '{print $14}' | awk '{print "("$1 " AND ERROR)"}'
 }
 
+find_installations() {
+  echo 'pycharm'
+  echo '/home/craig/.local/share/JetBrains/Toolbox/apps/PyCharm-C/ch-0/'
+  echo '______'
+  echo 'debian release info'
+  echo '/etc/os-release'
+  echo '______'
+}
+
+run_gumtree_scrape() {
+  cd /home/craig/git_repos/data-science/intro_to_python_gis
+  workers=10
+  for ((i=0; i<$workers; i++))
+    do
+        #gnome-terminal -e `bash -c 'cd /home/craig/git_repos/data-science/intro_to_python_gis; export PATH="/home/craig/anaconda3/bin:$PATH"; source activate gis;
+        #python -m tests.runner3 "$i" "$workers";'`
+        gnome-terminal -e "bash -c 'cd /home/craig/git_repos/data-science/intro_to_python_gis;ls;/home/craig/anaconda3/envs/gis/bin/python -m tests.runner3 $i $workers;sleep 500;'"
+    done
+}
+
+run_gumtree_scrape_rental() {
+  cd /home/craig/git_repos/data-science/intro_to_python_gis
+  workers=10
+  for ((i=0; i<$workers; i++))
+    do
+        #gnome-terminal -e `bash -c 'cd /home/craig/git_repos/data-science/intro_to_python_gis; export PATH="/home/craig/anaconda3/bin:$PATH"; source activate gis;
+        #python -m tests.runner3 "$i" "$workers";'`
+        gnome-terminal -e "bash -c 'cd /home/craig/git_repos/data-science/intro_to_python_gis;ls;/home/craig/anaconda3/envs/gis/bin/python -m tests.runner_rental $i $workers;sleep 60;'"
+    done
+}
+
+# __________ Reverse Proxy ___________
+dbs() {
+  cd $HOME/git_repos/reverseproxy
+  pyenv activate roomates
+  dc exec db bash -c -- "mysql -u wordpress -p wordpress"
+}
 # Auto convert .... to ../..
 # zstyle ':prezto:module:editor' dot-expansion 'yes'
 
@@ -1039,3 +1102,18 @@ catdifffile() {
 
 # Set the default session name:
  zstyle ':prezto:module:tmux:session' name 'CraigSession'
+
+ who_is_on_port(){
+   sudo fuser $1/tcp
+   echo 'sudo ls -l /proc/^^^^/exe'
+ }
+ setup_home_router() {
+   nmap
+   go to whatsmyip to find out WAN
+ }
+ see_who_has_connected() {
+    sudo zgrep sshd /var/log/auth.log* | grep rhost | sed -re 's/.*rhost=([^ ]+).*/\1/' | sort -u
+ }
+# set display picture using nitrogen
+nitrogen --restore
+
