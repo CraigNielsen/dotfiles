@@ -4,15 +4,21 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 export TERM="xterm-256color"
 export CURRENTPROJECT="$HOME/workspace/tal/tal/services/mrd_integration/"
 export OS='/Users/craig.ferguson'
-export STERN='stern --context kubernetes-admin@kubernetes'
+export STERN='stern --context staging'
 export KUBE_UAT_NAMESPACE="wmstesting"
 export KUBE_CRAIG_NAMESPACE="craig"
-export OFFICE="kubectl --context kubernetes-admin@kubernetes"
-export UAT="$OFFICE --namespace wmsuat"
+export OFFICE="kubectl --context staging"
 export CK="$OFFICE --namespace $KUBE_CRAIG_NAMESPACE"
+export UAT="$OFFICE --namespace wmsuat"
 export WMSTESTING="$OFFICE --namespace $KUBE_UAT_NAMESPACE"
 export MASTER="$OFFICE --namespace master"
 export PIP_REQUIRE_VIRTUALENV=false
+
+alias wmsuat="$UAT"
+alias checkout="kubectl --context staging --namespace checkout"
+export namespace_command="$UAT"
+export currentnamespace=wmsuat
+
 export TA=$HOME/workspace/dev-environments/kubernetes-environments/environment/roles/
 export TP=$HOME/workspace/dev-environments/kubernetes-environments/environment/patches/development/
 export CP=$HOME/workspace/cdev/kube/deployments
@@ -23,6 +29,7 @@ export PATCH=/home/craig/workspace/cdev/kube/patch.sh
 
 alias branchinfo="cat $HOME/workspace/cdev/branches_reference"
 alias branchinfoedit="vim $HOME/workspace/cdev/branches_reference"
+alias removepyc='find . -name \*.pyc -delete'
 
 alias v=vim .
 #alias keys="vim $HOME/.vimkeys.vimrc"
@@ -31,9 +38,11 @@ alias shortcuts="vim $HOME/.khdrc"
 alias plug="vim $HOME/plug.vimrc"
 alias dc=docker-compose
 alias n="nautilus"
+alias sos='cd ~/workspace/s4f-shipping-options-service'
+alias lfi='cd ~/workspace/s4f-wms-logfire-integration'
 alias mbs="cd $HOME/git_repos/mybondsite/backend;"
 #
-#alias officek='kubectl --context kubernetes-admin@kubernetes'
+#alias officek='kubectl --context staging'
 alias helpibt='open -a "Google Chrome" https://jira.takealot.com/wiki/display/TET/Auto+IBT+Process'
 alias prodk='kubectl --context production'
 pkd(){
@@ -41,11 +50,8 @@ pkd(){
 }
 alias ck="$CK"
 alias wmstesting="$WMSTESTING"
-alias ke="kubectl exec -i -t"
 alias ka="kubectl attach -i -t"
 alias office="$OFFICE"
-alias wmsuat="$UAT"
-currentnamespace=wmsuat
 alias master="$MASTER"
 alias ptw="ptw -- -x --lf"
 alias tal="cd $HOME/workspace/tal"
@@ -53,7 +59,7 @@ alias dimms="cd $HOME/workspace/s4f-dimension-processor"
 alias sick="cd $HOME/workspace/s4f-sick-integration-service"
 alias dis="cd $HOME/git_repos/distell"
 alias testdjango="find . -name '*.py' | entr python ./manage.py test "
-alias testsos="find . -name '*.py' | entr pytest $HOME/workspace/s4f-shipping-options-service/shipping_options_service/tests/test_shipping_options_controller.py"
+alias tdt='cd $HOME/workspace/tdt-integration-service'
 alias wmsuata="$UAT attach -it "
 
 prox() {
@@ -63,6 +69,9 @@ prox() {
 
 encrypt() {
   htpasswd -nb $1 $2
+}
+ke() {
+  kubectl exec -it $1 bash
 }
 # DIMs
 dockerbuildpush() {
@@ -85,25 +94,38 @@ kewms() {
   IFS=$SAVEIFS
 
 }
-rdimstemp() {
+kk() {
   SAVEIFS=$IFS
   IFS=$'\n'
   #cublogfire=$(kubectl get pod -o name | grep s4f-dimension-processor-cub-logfire-consumer | sed 's/pods\///')
   #cubwms=$(kubectl get pod -o name | grep s4f-dimension-processor-cub-wms | sed 's/pods\///')
-  dims=$(kubectl get pod -o name | grep s4f-dimension-processor | sed 's/pods\///')
-  echo $dims | xargs -n1 -P 3 kubectl  delete pod
   #
+  #dims=$(kubectl get pod -o name | grep s4f-dimension-processor | sed 's/pods\///')
+  #echo $dims | xargs -n1 -P 3 kubectl  delete pod
+
+  #wms=$(kubectl get pod -o name | grep wms-service | sed 's/pods\///')
+  #echo $wms | xargs -n1 -P 3 kubectl  delete pod
+
   #log=$(kubectl get pod -o name | grep logfire-integration | sed 's/pods\///')
   #echo $log
   #echo $log | xargs -n1 -P 3 kubectl  delete pod
 
+  #ship=$(kubectl get pod -o name | grep shipping-option | sed 's/pods\///')
+  #kubectl delete pod $ship --grace-period=0
+  #
   #kubectl delete pod $log --grace-period=0
+
   #tsm=$(kubectl get pod -o name | grep li-tsm | sed 's/pods\///')
   #kubectl delete pod $tsm --grace-period=0
-  #
+
+  tdt=$(kubectl get pod -o name | grep tdt | sed 's/pods\///')
+  echo $tdt | xargs -n1 -P 3 kubectl  delete pod
+
+  #dash=$(kubectl get pod -o name | grep dashboard | sed 's/pods\///')
+  #echo $dash | xargs -n1 -P 3 kubectl  delete pod
+
   #wms=$(kubectl get pod -o name | grep -v s3f | grep wms-service | sed 's/pods\///')
-  #echo $wms
-  #echo $wms | xargs -n1 -P 3 kubectl  delete pod
+  #echo $wms | xargs -n1 -p 3 kubectl  delete pod
 
   #sleep 2
   #wms=$(kubectl get pod -o name | grep -v s3f | grep wms-service | sed 's/pods\///')
@@ -120,118 +142,179 @@ rdimstemp() {
   #kubectl delete pod $cublogfire
   #kubectl delete pod $cubwms
 }
-test() {
-  someting=$(kubectl --context kubernetes-admin@kubernetes get pods --namespace $currentnamespace)
-  echo $someting
-}
+# ______________________________________________________________________________
 pushswms() {
   md
-  here=$(pwd)
   #tag=kak
   tag=WMS-2365
   cd $HOME/workspace/service_wms && docker build -t image-registry.ci.env:80/takealot/service_wms:$tag . && docker push image-registry.ci.env:80/takealot/service_wms:$tag
-  mycons=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s3f-wms-mysql-consumer-cpt | sed 's/pods\///')
-  myconstsin=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s3f-wms-mysql-tsin-consumer-cpt | sed 's/pods\///')
+  mycons=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep s3f-wms-mysql-consumer-cpt | sed 's/pods\///')
+  myconstsin=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep s3f-wms-mysql-tsin-consumer-cpt | sed 's/pods\///')
 
   SAVEIFS=$IFS
   IFS=$'\n'
-  wms=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s3f-wms-service | sed 's/pods\///')
+  wms=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep s3f-wms-service | sed 's/pods\///')
 
-  kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod  $mycons
+  kubectl --context staging --namespace $currentnamespace delete pod  $mycons
 
-  echo $myconstsin | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
-  echo $wms | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
+  echo $myconstsin | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
+  echo $wms | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
   IFS=$SAVEIFS
-  cd $here
 }
 watchuatrabbitqueues () {
-  rabbit=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep rabbitmq-wms | sed 's/pods\///')
-  kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace exec -it $rabbit -- rabbitmqctl list_queues -p wms
+  rabbit=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep rabbitmq-wms | sed 's/pods\///')
+  kubectl --context staging --namespace $currentnamespace exec -it $rabbit -- rabbitmqctl list_queues -p wms
 }
 pushdash() {
   md
-  here=$(pwd)
-  tag='WMS-388'
-  wms388=('wms-service' 'dashboard' 'submit-po-to-adaptris' 'adaptris-service')
+  #tag='WMS-3598'
+  tag='WMS-3589' # update orderitem on dashboard parcel management
+  #wms388=('wms-service' 'dashboard' 'submit-po-to-adaptris' 'adaptris-service')
+  wms3598=('wms-service' 'dashboard')
 
   cd $HOME/workspace/tal && docker build -t image-registry.ci.env:80/takealot/tal-with-requirements:$tag . && docker push image-registry.ci.env:80/takealot/tal-with-requirements:$tag
-  cd $here
 # Save current IFS
   SAVEIFS=$IFS
 # Change IFS to new line.
   IFS=$'\n'
-  wms=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep -v lb | grep dashboard | sed 's/pods\///')
-  submitpo=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep -v lb | grep submit-po-to-adaptris | sed 's/pods\///')
-  adaptris=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep -v lb | grep adaptris-service | sed 's/pods\///')
-  echo $wms | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
-  echo $submitpo | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
-  echo $adaptris | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
+  wms=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep -v lb | grep wms-service | sed 's/pods\///')
+  dash=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep -v lb | grep dashboard | sed 's/pods\///')
+  #submitpo=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep -v lb | grep submit-po-to-adaptris | sed 's/pods\///')
+  #adaptris=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep -v lb | grep adaptris-service | sed 's/pods\///')
+  echo $wms | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
+  echo $dash | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
+  #echo $submitpo | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
+  #echo $adaptris | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
 # Restore IFS
   IFS=$SAVEIFS
-  printf "%s\n" "${wms388[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
+  #printf "%s\n" "${wms388[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
+  printf "%s\n" "${wms3598[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
 }
 pushsick() {
   md
-  here=$(pwd)
   tag='WMS-3366'
   cd $HOME/workspace/s4f-sick-integration-service && docker build -t image-registry.ci.env:80/takealot/s4f-sick-integration-service:$tag . && docker push image-registry.ci.env:80/takealot/s4f-sick-integration-service:$tag
-  cd $here
 # Save current IFS
   SAVEIFS=$IFS
 # Change IFS to new line.
   IFS=$'\n'
-  sick=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep sick-client | sed 's/pods\///')
-  echo $sick | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
+  sick=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep sick-client | sed 's/pods\///')
+  echo $sick | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
+# Restore IFS
+  IFS=$SAVEIFS
+}
+# _________________________________________________________________________________
+pushtdt() {
+  md
+  tag='WMS-3329'
+  cd $HOME/workspace/tdt-integration-service/tdt-integration-service && docker build -t image-registry.ci.env:80/takealot/tdt-integration-service:$tag . && docker push image-registry.ci.env:80/takealot/tdt-integration-service:$tag
+# Save current IFS
+  SAVEIFS=$IFS
+# Change IFS to new line.
+  IFS=$'\n'
+  tdt=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep -v s3f | grep tdt-integration-service | sed 's/pods\///')
+  echo $tdt | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
+# Restore IFS
+  IFS=$SAVEIFS
+}
+pushsos() {
+  md
+  tag='WMS-3324'
+  cd $HOME/workspace/s4f-shipping-options-service && docker build -t image-registry.ci.env:80/takealot/s4f-shipping-options-service:$tag . && docker push image-registry.ci.env:80/takealot/s4f-shipping-options-service:$tag
+# Save current IFS
+  SAVEIFS=$IFS
+# Change IFS to new line.
+  IFS=$'\n'
+  sos=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep -v s3f | grep shipping-options-service | sed 's/pods\///')
+  checkout_sos=$(kubectl --context staging --namespace checkout get pod -o name | grep -v s3f | grep shipping-options-service | sed 's/pods\///')
+  echo $sos | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
+  echo $checkout_sos| xargs -n1 -P 3 kubectl --context staging --namespace checkout delete pod
 # Restore IFS
   IFS=$SAVEIFS
 }
 pushwms() {
   md
-  here=$(pwd)
-  tag='WMS-2365'
+  #tag='WMS-3646'
+  #tag='WMS-3784'
+  tag=$dimstag
   cd $HOME/workspace/tal && docker build -t image-registry.ci.env:80/takealot/tal-with-requirements:$tag . && docker push image-registry.ci.env:80/takealot/tal-with-requirements:$tag
-  cd $here
 # Save current IFS
   SAVEIFS=$IFS
 # Change IFS to new line.
   IFS=$'\n'
-  wms=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep -v s3f | grep wms-service | sed 's/pods\///')
-  echo $wms | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
+  wms=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep -v s3f | grep wms-service | sed 's/pods\///')
+  echo $wms | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
 # Restore IFS
   IFS=$SAVEIFS
 }
 stagealotcat() {
   ttab  -t "stagealot" "ssh -t -A toor@stagealot.com  cat /etc/bind/db.stagealot.com | grep  '$1'"
 }
-pushlfi() {
+uatscalesftp() {
   md
   here=$(pwd)
-  tag='WMS-2859-craig'
-  cd $HOME/workspace/s4f-wms-logfire-integration && docker build -t image-registry.ci.env:80/takealot/s4f-wms-logfire-integration:$tag . && docker push image-registry.ci.env:80/takealot/s4f-wms-logfire-integration:$tag
-  cd $here
 # Save current IFS
   SAVEIFS=$IFS
 # Change IFS to new line.
   IFS=$'\n'
-  lfi=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep logfire-integration- | sed 's/pods\///')
-  echo $lfi | xargs -n1 -P 3 kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod
+  sftpwms=$(kubectl --context staging --namespace $currentnamespace get deployment -o name | grep s3f-wms-sftp | sed 's/deployments\///')
+
+  echo $sftpwms
+  echo $sftpwms | xargs -I % sh -c ' kubectl --context staging --namespace $currentnamespace scale deployment % --replicas 0'
+
+
+  lfi=$(kubectl --context staging --namespace $currentnamespace get deployment -o name | grep logfire-integration- | sed 's/deployments\///')
+  echo $lfi | xargs -I % sh -c ' kubectl --context staging --namespace $currentnamespace scale deployment % --replicas 1'
+
+# Restore IFS
+  IFS=$SAVEIFS
+}
+pushlfi() {
+  md
+  tag='WMS-2859-craig'
+  cd $HOME/workspace/s4f-wms-logfire-integration && docker build -t image-registry.ci.env:80/takealot/s4f-wms-logfire-integration:$tag . && docker push image-registry.ci.env:80/takealot/s4f-wms-logfire-integration:$tag
+# Save current IFS
+  SAVEIFS=$IFS
+# Change IFS to new line.
+  IFS=$'\n'
+  lfi=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep logfire-integration- | sed 's/pods\///')
+  echo $lfi | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
 # Restore IFS
   IFS=$SAVEIFS
 }
 pushdims() {
   md
   here=$(pwd)
-  tag='WMS-3009'
+  #tag='WMS-3638'
+  tag=$dimstag
   cd $HOME/workspace/s4f-dimension-processor && docker build -t image-registry.ci.env:80/takealot/s4f-dimension-processor:$tag . && docker push image-registry.ci.env:80/takealot/s4f-dimension-processor:$tag
   cd $here
-  wms=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s4f-dimension-processor-cub-wms | sed 's/pods\///')
-  cub=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s4f-dimension-processor-cub-logfire | sed 's/pods\///')
-  sick=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s4f-dimension-processor-sick-consumer | sed 's/pods\///')
-  tsm=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep s4f-dimension-processor-tsm-consumer | sed 's/pods\///')
-  kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod  $tsm
-  kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod  $sick
-  kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod  $wms
-  kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace delete pod  $cub
+  wms=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep s4f-dimension-processor-cub-wms | sed 's/pods\///')
+  cub=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep s4f-dimension-processor-cub-logfire | sed 's/pods\///')
+  sick=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep s4f-dimension-processor-sick-consumer | sed 's/pods\///')
+  tsm=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep s4f-dimension-processor-tsm-consumer | sed 's/pods\///')
+  kubectl --context staging --namespace $currentnamespace delete pod  $tsm
+  kubectl --context staging --namespace $currentnamespace delete pod  $sick
+  kubectl --context staging --namespace $currentnamespace delete pod  $wms
+  kubectl --context staging --namespace $currentnamespace delete pod  $cub
+}
+view_uat_kafka() {
+  ssh toor@kafka02.stagealot.com /opt/kafka/bin/kafka-topics.sh --list --zookeeper 10.4.1.80:2181
+}
+kafka_view_uat_topic() {
+  ssh toor@kafka02.stagealot.com /opt/kafka/bin/kafka-console-consumer.sh --topic $1 --zookeeper 10.4.1.80:2181
+}
+view_uat_kafka_pack() {
+  ssh toor@kafka02.stagealot.com /opt/kafka/bin/kafka-console-consumer.sh --topic warehouse_pack --zookeeper 10.4.1.80:2181
+}
+kafka_prod_view() {
+    ssh -t -A craigferguson@jump-box.takealot.com "ssh toor@kafka01 /opt/kafka/bin/kafka-topics.sh --list --zookeeper 10.2.17.1:2181"
+  #echo "ssh kafka01"
+  #echo '/opt/kafka/bin/kafka-console-consumer.sh --topic instructions_service --zookeeper 10.2.17.1:2181 --from-beginning'
+  #echo '/opt/kafka/bin/kafka-topics.sh --list --zookeeper 10.2.17.1:2181'
+}
+view_kafka_PROD_topic() {
+    ssh -t -A craigferguson@jump-box.takealot.com "ssh toor@kafka01 /opt/kafka/bin/kafka-console-consumer.sh --topic $1 --zookeeper 10.4.1.80:2181"
 }
 add_sftp_file_uat() {
   here=$(pwd)
@@ -261,25 +344,31 @@ login_to_postgis() {
 }
 hiuat() {
   #tag='WMS-3009'
-  local tag=`git rev-parse --abbrev-ref HEAD`
+  #local tag=`git rev-parse --abbrev-ref HEAD`
+  #local tag='WMS-388'
   #tag='master'
+  tag=$dimstag
   echo 'installing tag '$tag
-  helm upgrade --install $1 --kube-context kubernetes-admin@kubernetes  $2 --namespace $currentnamespace --set image.pullPolicy=Always,image.tag=$tag
+  helm upgrade --install $1 --kube-context staging  $2 --namespace $currentnamespace --set image.pullPolicy=Always,image.tag=$tag
 }
 hduat() {
-  helm del --purge --kube-context kubernetes-admin@kubernetes $1
+  helm del --purge --kube-context staging $1
 }
 huatls() {
-  helm --kube-context kubernetes-admin@kubernetes --namespace $currentnamespace ls
+  helm --kube-context staging --namespace $currentnamespace ls
 }
 hmasterls() {
-  helm --kube-context kubernetes-admin@kubernetes --namespace master ls
+  helm --kube-context staging --namespace master ls
 }
 
-alias hwms="helm upgrade --install wms-service ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=master,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
-alias hdash="helm upgrade --install dash charts/dashboard --set dashboard.dev.patch=false,dashboardLb.dev.patch=true,dashboard.dev.hostPath=$HOME/workspace/tal/tal,dashboardLb.dev.hostPath=$HOME/workspace/tal/tal/services/dashboard/static,dashboard.image.tag=WMS-388"
-alias hsos="helm upgrade --install sos $OS/workspace/s4f-shipping-options-service/charts/s4f-shipping-options-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-shipping-options-service/shipping_options_service,dev.mountPath=/usr/local/tal/s4f-shipping-options-service/shipping_options_service,image.tag=WMS-3015,resources.requests.cpu=300m,resources.limits.cpu=330"
-alias hdims="helm upgrade --install dimms $OS/workspace/s4f-dimension-processor/charts/s4f-dimension-processor --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-dimension-processor,dev.mountPath=/usr/local/tal/s4f-dimension-processor,image.tag=WMS-1910,resources.requests.cpu=300m,resources.limits.cpu=330"
+dimstag=WMS-3787
+
+alias hwms="helm upgrade --install wms ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=WMS-3787,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
+alias hshipwms="helm upgrade --install wms-shipping-service ~/workspace/tal/charts/wms-shipping-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=master,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
+alias hdash="helm upgrade --install dash charts/dashboard --set dashboard.dev.patch=true,dashboardLb.dev.patch=true,dashboard.dev.hostPath=$HOME/workspace/tal,dashboardLb.dev.hostPath=$HOME/workspace/tal/tal/services/dashboard/static,dashboard.image.tag=master"
+sostag='WMS-3324'
+alias hsos="helm upgrade --install sos $OS/workspace/s4f-shipping-options-service/charts/s4f-shipping-options-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-shipping-options-service/shipping_options_service,dev.mountPath=/usr/local/tal/s4f-shipping-options-service/shipping_options_service,image.tag=$sostag,resources.requests.cpu=300m,resources.limits.cpu=330"
+alias hdims="helm upgrade --install dimms $OS/workspace/s4f-dimension-processor/charts/s4f-dimension-processor --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-dimension-processor,dev.mountPath=/usr/local/tal/s4f-dimension-processor,image.tag=$dimstag,resources.requests.cpu=300m,resources.limits.cpu=330"
 alias hlfi="helm upgrade --install lfi $OS/workspace/s4f-wms-logfire-integration/charts/s4f-wms-logfire-integration --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/s4f-wms-logfire-integration,dev.mountPath=/usr/local/tal/s4f-wms-logfire-integration,image.tag=WMS-2859,resources.requests.cpu=300m,resources.limits.cpu=330"
 alias hswms="helm upgrade --install service-wmsm ~/workspace/service_wms/charts/s3f-wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.hostPath=$OS/workspace/service_wms,resources.requests.cpu=400m,resources.limits.cpu=430 "
 alias hswms_sftp_consumers="helm upgrade --install swms-sftp-cons ~/workspace/service_wms/charts/s3f-wms-sftp-consumers/ --set image.pullPolicy=IfNotPresent,dev.patch=true,image.tag=WMS-2365,dev.hostPath=$OS/workspace/service_wms,resources.requests.cpu=400m,resources.limits.cpu=430 "
@@ -288,48 +377,123 @@ alias htimer="helm upgrade --install s4f-timer-service ~/workspace/s4f-timer-ser
 alias horders="helm upgrade --install order-service ~/workspace/tal/charts/order-service --set image.pullPolicy=Always,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,resources.requests.cpu=300m,resources.limits.cpu=330 "
 alias hcomms="helm upgrade --install comms ~/workspace/s4f-comms-service/charts/s4f-comms-service --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/s4f-comms-service/comms_service,dev.hostPath=$HOME/workspace/s4f-comms-service/comms_service,resources.requests.cpu=300m,resources.limits.cpu=330 "
 alias hdel='helm del --purge'
+htdt () {
+  tag='WMS-3329'
+  cd ~/workspace/tdt-integration-service/tdt-integration-service
+  helm upgrade --install tdt --set dev.patch=true,dev.hostPath=$PWD/tdt_integration_service,image.tag=$tag charts/tdt-integration-service
+}
+generate_proto_tdt() {
+  /Users/craig.ferguson/workspace/tdt-integration-service/scripts/generate_proto.sh
+}
 #watch network
 alias watchnet="watch -n 1 'sudo netstat -tanop'"
 alias watchsockets="watch -n 1 'ss -s'"
 
-alias suat="stern --context kubernetes-admin@kubernetes -n $currentnamespace"
-alias smaster="stern --context kubernetes-admin@kubernetes -n master"
+alias suat="stern --context staging -n $currentnamespace"
+alias scheckout="stern --context staging -n checkout"
+alias smaster="stern --context staging -n master"
 alias sprod="stern --context production"
 alias resumekube='~/workspace/tal-kubernetes/bin/resume-minikube.sh'
 fucksky() {
   sky=$(kubectl get pod --namespace kube-system -o name | grep skywriter  | sed 's/pods\///')
   kubectl delete pod --namespace kube-system $sky
 }
+fuckpycache() {
+  sudo rm -rf .pytest_cache
+}
 hsftp() {
  cd /Users/craig.ferguson/workspace/cdev/kube/deployments
  kubectl create -f sftp
 }
-wmsuatimages() {
+wmsuatupdatetags() {
 
   wms388=('wms-service' 'dashboard' 'submit-po-to-adaptris' 'adaptris-service')
-  wms2365=('s3f-wms-service' 's3f-wms-mysql-consumer-cpt' 's3f-wms-mysql-tsin-consumer-cpt' 'wms-service')
-  wms3009=('s4f-dimension-processor' )
-  wms3366=('s4f-dimension-processor' 's4f-sick-client-cpt-inline-01' 'logfire-integration')
-  #for i in $services; do
-    #echo $i;
-    #echo $i;
-  #done
   echo "388 User logging"
-  printf "%s\n" "${wms388[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
+  printf "%s\n" "${wms388[@]}" | xargs -I % sh -c 'echo %; $namespace_command set image deployments/%  %=image-registry.ci.env:80/takealot/tal-with-requirements:WMS-388'
   echo ''
 
-  echo "2365 Voetstoets"
-  printf "%s\n" "${wms2365[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
+}
+
+wmsuatimages() {
+
+  wms3769=('s4f-dimension-processor' 'wms-service')
+  wms3765=('wms-service' 'dashboard')
+  wms3787=('wms-service' 'dashboard' 's4f-dimension-processor')
+  wms3589=('wms-service' 'dashboard' 's4f-dimension-processor')
+  wms3329=('wms-service' 'tdt-integration-service')
+  wms2365=('s3f-wms-service' 's3f-wms-mysql-consumer-cpt' 's3f-wms-mysql-tsin-consumer-cpt' 'wms-service')
+
+  #wms3366=('s4f-dimension-processor' 's4f-sick-client-cpt-inline-01' 's4f-dimension-processor-cub-logfire-consumer' 's4f-wms-logfire-integration-cub-poller-cpt' 's4f-wms-logfire-integration-cub-poller-jhb' 's4f-wms-logfire-integration-sic-poller-cpt' 's4f-wms-logfire-integration-sic-poller-jhb' 's4f-wms-logfire-integration-tsm-poller-cpt' 's4f-wms-logfire-integration-tsm-poller-jhb')
+  wms3366=('s4f-dimension-processor' 's4f-sick-client-cpt-inline-01' 's4f-wms-logfire-integration-sic-poller-cpt' 's4f-wms-logfire-integration-sic-poller-jhb')
+
+
+  echo "3769 move cub message to consumer and out of dimension processor"
+  echo "https://jira.takealot.com/jira/browse/WMS-3769"
+  printf "%s\n" "${wms3769[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
   echo ''
 
-  echo "3009 Dimensions Consumers"
-  printf "%s\n" "${wms3009[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
+
+  echo "3765 Add repack button to dashboard for when messages fail into wmsapi"
+  echo "https://jira.takealot.com/jira/browse/WMS-3765"
+  echo "https://github.com/TAKEALOT/tal/pull/7707"
+  printf "%s\n" "${wms3765[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
   echo ''
+
+  echo "3329 Order Injections DOP"
+  echo "https://jira.takealot.com/jira/browse/WMS-3329"
+  echo "https://github.com/TAKEALOT/tal/pull/7711 WMS-3329"
+  echo "https://github.com/TAKEALOT/tdt-integration-service/pull/2"
+  printf "%s\n" "${wms3329[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  echo ''
+
+  #echo "2365 Voetstoets"
+  #printf "%s\n" "${wms2365[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  #echo ''
 
   echo "3366 Sick Integration 3009 dims logfire int 2859"
-  printf "%s\n" "${wms3366[@]}" | xargs -I % sh -c 'echo %; $UAT describe deployments % | grep image'
+  printf "%s\n" "${wms3366[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
   echo ''
 
+  echo  "Update OrderItems directly in field on dashboard, TESTED DEPLOY"
+  echo "3589 need to do a check for the order items"
+  echo "https://jira.takealot.com/jira/browse/WMS-3589"
+  echo "https://github.com/TAKEALOT/tal/pull/7691/files"
+  printf "%s\n" "${wms3589[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  echo ''
+
+
+  echo "3787 retries for pack using event type, TESTED DEPLOY"
+  echo "https://jira.takealot.com/jira/browse/WMS-3787"
+  printf "%s\n" "${wms3787[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  echo ''
+}
+#mongo_prod_query() {
+    #ssh -A craigferguson@jump-box.takealot.com
+    #mongo mongo02:27017/talSet
+    #use takealot;
+    #rs.slaveOk();
+    #show collections;
+    #db.<collection>.find({_id: ObjectId("<Object ID>")})
+    ##* Use 'show collections' to show available collections
+    ##* To find the latest record
+    #db.collection.find().limit(1).sort({$natural:-1}).pretty()
+    ##db.addressbook.update({_id: ObjectId("5a6f8068404b4700129d8c1c")}, {$set: { "fields.addressee": "Luis Alberto Perera Perera Hernandez"}})
+#}
+restartsickserver() {
+
+  SAVEIFS=$IFS
+  IFS=$'\n'
+  services=('socket-server')
+  for i in $services; do
+    wms=$(kubectl --context staging --namespace wmsuat get pods -o name | grep -v s3f | grep $i | sed 's/pods\///')
+    echo $wms | xargs -I % sh -c '$UAT delete pod % '
+  done
+  IFS=$SAVEIFS
+  sleep 7
+  services=('socket-server')
+  server=$(kubectl --context staging --namespace wmsuat get pods -o name | grep -v s3f | grep $i | sed 's/pods\///')
+  echo $server
+  echo $server | xargs -I % sh -c '$UAT attach -it pod % '
 }
 wmsuatrestart() {
 
@@ -339,7 +503,7 @@ wmsuatrestart() {
   services=('wms-service' 'dashboard' 's3f-wms-service', 'submit-po-to-adaptris', 'adaptris-service')
 
   for i in $services; do
-    wms=$(kubectl --context kubernetes-admin@kubernetes --namespace wmsuat get pods -o name | grep -v s3f | grep $i | sed 's/pods\///')
+    wms=$(kubectl --context staging --namespace wmsuat get pods -o name | grep -v s3f | grep $i | sed 's/pods\///')
     echo $wms | xargs -I % sh -c '$UAT delete pod % '
   done
 
@@ -352,7 +516,7 @@ wmsuatrestart() {
 #alias watchuat="$HOME/workspace/cdev/kube/watch_uat.py"
 #alias watch2="$HOME/workspace/cdev/kube/watch_kube.py '$CK'"
 
-alias pods_wmstesting="watch -n 1 'kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pods'"
+alias pods_wmstesting="watch -n 1 'kubectl --context staging --namespace wmstesting get pods'"
 alias protoc26='/usr/local/opt/protobuf@2.6/bin/protoc'
 
 generateprotota(){
@@ -372,7 +536,7 @@ restart_kube() {
   echo 'md'
 }
 watch_wmstesting() {
-  #sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
+  #sftp=$(kubectl --context staging --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
 
   # give sftp in wmstesting so can copy files
   #$HOME/workspace/cdev/kube/watch_pods.py $WMSTESTING $sftp
@@ -381,11 +545,11 @@ watch_wmstesting() {
   $HOME/workspace/cdev/kube/sterntsinconsumers.py wmstesting
 }
 wmsuate() {
-  kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace exec -it $1 bash
+  kubectl --context staging --namespace $currentnamespace exec -it $1 bash
 }
 watchuat() {
-  ttab -t "UAT"  "watch -n 1 'kubectl --context kubernetes-admin@kubernetes get pods --namespace $currentnamespace'"
-  ttab -t "UAT"  "watch -n 1 'kubectl --context kubernetes-admin@kubernetes get services --namespace $currentnamespace'"
+  ttab -t "UAT"  "watch -n 1 'kubectl --context staging get pods --namespace $currentnamespace'"
+  ttab -t "UAT"  "watch -n 1 'kubectl --context staging get services --namespace $currentnamespace'"
 }
 watch1() {
   ttab -t "MINIKUBE"  "watch -n 1 'kubectl get pods --all-namespaces'"
@@ -402,8 +566,8 @@ lf () {
 
 watch3() {
   #lsftp=$(kubectl get pod -o name | grep tsin-dimensions-sftp | sed 's/pods\///')
-  sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace $currentnamespace get pod -o name | grep sftp-wms | sed 's/pods\///')
-  #poller=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep cub-poller | sed 's/pods\///')
+  sftp=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep sftp-wms | sed 's/pods\///')
+  #poller=$(kubectl --context staging --namespace wmstesting get pod -o name | grep cub-poller | sed 's/pods\///')
   #if [[ -z $lsftp ]]
     #then
     #echo 'please make sure local tsin-dims sftp consumer is running'
@@ -433,7 +597,7 @@ sftp_box(){
  sftp takealotif@b1sftplogfireapps.com
 }
 #add_sftp_file(){
-  #sftp=$(kubectl --context kubernetes-admin@kubernetes --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
+  #sftp=$(kubectl --context staging --namespace wmstesting get pod -o name | grep sftp-wms | sed 's/pods\///')
   #wmstesting exec -i -t $sftp -- bash -c "cp /tmp/CUB_TEST_001 /home/wms/data/TAL/CPT/output/$1"
 
   #sshpass -e sftp -oBatchMode=no -b - takealot_uat_if@uatsftp.logfireapps.com
@@ -516,8 +680,8 @@ alias rec="/home/craig/git_repos/receipts/receipts_server"
 alias kaf="cd $HOME/git_repos/kafka/code;"
 
 alias k="kubectl"
+alias khsetup="source <(helm completion zsh)"
 alias ksetup="source <(kubectl completion zsh)"
-alias ksetup="source <(helm completion zsh)"
 alias kc="kubectl create"
 alias kgp="kubectl get pods -owide --all-namespaces --show-all"
 alias pgp="kubectl --context production get pods -owide --all-namespaces --show-all"
@@ -567,7 +731,7 @@ setopt correct
 unsetopt correctall
 
 wmsuate() {
-    kubectl --context kubernetes-admin@kubernetes --namespace wmsuat exec -i -t $1 bash
+    kubectl --context staging --namespace wmsuat exec -i -t $1 bash
 }
 pep() {
     kubectl --context production exec -i -t $1 bash
@@ -605,8 +769,8 @@ krun() {
   k run my-shell --rm -i --tty --image 10.4.1.39:5000/takealot/warehouse_pack:master -- bash -c " pip install pudb;export ROLE=KUBERNETES;export ENVIRONMENT=STAGING; kafka_consumer --consumer_type tsin_dimensions_sftp
 "
 }
-prodkrun() {
-
+prodke() {
+  kubectl --context production exec -it $1 bash
 }
 #krun2() {
   #kubectl --context production exec -i --tty $1 -- bash -c "kafka_consumer --consumer_type tsin_dimensions_sftp"
@@ -675,13 +839,76 @@ scrape() {
 TESTsos() {
   NAME=$(kubectl get pod -o name | grep shipping | sed 's/pods\///')
   kubectl exec  $NAME -- bash -c "pip install pytest unittest2 mock"
-  kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_shipping_options_controller.py"
-  find . -name '*.py' | entr kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_shipping_options_controller.py"
+  find . -name '*.py' | entr kubectl exec  $NAME -- bash -c "pytest -s dimension_processor/tests/test_elastic_search_consumer.py"
+}
+testtdt() {
+  cd $HOME/workspace/tdt-integration-service
+  NAMES=$(kubectl get pod -o name | grep tdt-integration-service  | sed 's/pods\///')
+  read -r NAME <<< "$NAMES"
+   echo $NAME
+  #NAME=$($namespace_command get pod -o name | grep wms-service | sed 's/pods\///')
+  kubectl exec  $NAME -- bash -c "pip install pytest unittest2 mock"
+  #kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_service_endpoints.py"
+  find . -name '*.py' | entr kubectl exec  $NAME -- bash -c "pytest -s tests/integration_tests/test_order_injection_consumer.py"
+}
+
+testpipe() {
+  cd /Users/craig.ferguson/workspace/data_pipeline/
+  find . -name '*.py' | entr pytest -s tests/unit_tests/core/test_pipeline.py
+}
+
+testesc() {
+  cd ~/workspace/s4f-dimension-processor
+  NAMES=$(kubectl get pod -o name | grep dimension-processor  | sed 's/pods\///')
+  read -r NAME <<< "$NAMES"
+  echo $NAME
+}
+testwms() {
+  SAVEIFS=$IFS
+  cd $HOME/workspace/tal
+  IFS=$'\n'
+  NAMES=$(kubectl get pod -o name | grep -v s3f | grep -v Terminating | grep wms-service  | sed 's/pods\///')
+  #
+  read -r NAME <<< "$NAMES"
+  #NAME=$($namespace_command get pod -o name | grep wms-service | sed 's/pods\///')
+  kubectl exec  $NAME -- bash -c "pip install pytest unittest2 mock"
+  #kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_service_endpoints.py"
+  #find . -name '*.py' | entr kubectl exec  $NAME --  bash -c "pytest -s tal/services/wms/test/test_shipping_queue_utilities.py"
+# move order injections out of tal:
+  find . -name '*.py' | entr kubectl exec  $NAME --  bash -c "pytest -s tal/services/wms/test/test_wms_client.py"
+  IFS=$SAVEIFS
+}
+testsos() {
+  cd ~/workspace/s4f-shipping-options-service
+  NAMES=$(kubectl get pod -o name | grep shipping-options  | sed 's/pods\///')
+  read -r NAME <<< "$NAMES"
+   echo $NAME
+  #NAME=$($namespace_command get pod -o name | grep wms-service | sed 's/pods\///')
+  kubectl exec  $NAME -- bash -c "pip install pytest unittest2 mock"
+  #kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_service_endpoints.py"
+  find . -name '*.py' | entr kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_service_endpoints.py"
+  #find . -name '*.py' | entr kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_schemas.py"
 }
 TESTdims() {
   NAME=$(kubectl get pod -o name | grep processor-sick-consumer | sed 's/pods\///')
   kubectl exec  $NAME -- bash -c "pip install pytest pudb unittest2"
   kubectl exec  $NAME -- bash -c "pytest -s dimension_processor/tests/test_consumers_warehouse_pack_handler.py"
+}
+TESTdash() {
+   echo $currentnamespace
+   NAME=$(kubectl --context staging --namespace $currentnamespace get pods -o name | grep wms-service | sed 's/pods\///')
+   echo $NAME
+  #NAME=$($namespace_command get pod -o name | grep wms-service | sed 's/pods\///')
+  kubectl --context staging --namespace $currentnamespace exec  $NAME -- bash -c "pip install pytest pudb unittest2"
+  kubectl --context staging --namespace $currentnamespace exec  $NAME -- bash -c "pytest -s tal/services/wms/test/test_wms_AuditLogger.py"
+}
+testdash() {
+  NAMES=$(kubectl get pod -o name | grep -v s3f | grep -v Terminating | grep wms-service  | sed 's/pods\///')
+  read -r NAME <<< "$NAMES"
+   echo $NAME
+  #NAME=$($namespace_command get pod -o name | grep wms-service | sed 's/pods\///')
+  kubectl exec  $NAME -- bash -c "pip install pytest pudb unittest2"
+  kubectl exec  $NAME -- bash -c "pytest -s tal/services/wms/test/test_wms_AuditLogger.py"
 }
 TESTlfi() {
   cd $HOME/workspace/s4f-wms-logfire-integration;
@@ -697,10 +924,12 @@ TESTwmsapi() {
   SAVEIFS=$IFS
   IFS=$'\n'
   NAMES=$(kubectl get pod -o name | grep -v s3f | grep -v Terminating | grep wms-service  | sed 's/pods\///')
+  #
   read -r NAME <<< "$NAMES"
-  kubectl exec  $NAME -- bash -c "pip install pytest pudb"
-  kubectl exec  $NAME -- bash -c "pytest -s tal/services/wms/test/test_wms_AuditLogger.py"
-  #kubectl exec  $NAME -- bash -c "pytest -s tal/services/outbound_orders/test/test_inbound_auto_ibt.py"
+  #NAME=$($namespace_command get pod -o name | grep wms-service | sed 's/pods\///')
+  kubectl exec  $NAME -- bash -c "pip install pytest unittest2 mock"
+  #kubectl exec  $NAME -- bash -c "pytest -s shipping_options_service/tests/test_service_endpoints.py"
+  find . -name '*.py' | entr kubectl exec  $NAME --  bash -c "pytest -s tal/services/wms/test/test_wms_client.py"
   IFS=$SAVEIFS
 }
 TESTMR() {
@@ -847,7 +1076,7 @@ grep_jhb_sick_logs() {
   }
   restartCPTSICKInline() {
     ssh-add
-    ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_cpt_inline
+    ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_cpt_inline_01
   }
   restartCPTSICKStatic01() {
     ssh-add
@@ -857,9 +1086,9 @@ grep_jhb_sick_logs() {
     ssh-add
     ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_cpt_static_02
   }
-  restartJHBSICKInline() {
+  restartJHBSICKInline01() {
     ssh-add
-    ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_jhb_inline
+    ssh -A craigferguson@jump-box.takealot.com ssh s4f-services01 supervisorctl restart tcp_socket_client_jhb_inline_01
   }
   restartJHBSICKStatic01() {
     ssh-add
@@ -1115,5 +1344,25 @@ dbs() {
     sudo zgrep sshd /var/log/auth.log* | grep rhost | sed -re 's/.*rhost=([^ ]+).*/\1/' | sort -u
  }
 # set display picture using nitrogen
-nitrogen --restore
 
+#__________NETWORKS_________________
+source $HOME/git_repos/craig_help/wiki_terminal/networkrc
+source $HOME/git_repos/craig_help/wiki_terminal/https
+source $HOME/git_repos/craig_help/wiki_terminal/processes_and_jobs
+source $HOME/git_repos/craig_help/wiki_terminal/files_permissions
+source $HOME/git_repos/craig_help/wiki_terminal/linux_environment_etc
+alias ewiki_networks='vim $HOME/git_repos/craig_help/wiki_terminal/networkrc'
+alias ewiki_https='vim $HOME/git_repos/craig_help/wiki_terminal/https'
+alias ewiki_processes_jobs='vim $HOME/git_repos/craig_help/wiki_terminal/processes_and_jobs'
+alias ewiki_file_permissions='vim $HOME/git_repos/craig_help/wiki_terminal/files_permissions'
+alias ewiki_file_permissions='vim $HOME/git_repos/craig_help/wiki_terminal/linux_environment_etc'
+
+#_________RECENT___________________
+# add the last command to a function wip
+add_function() {
+  func=$(tail -n 2 $HOME/.zhistory)
+  read -r NAME <<< "$func"
+  echo $read | xargs -n1 echo
+}
+
+nitrogen --restore
