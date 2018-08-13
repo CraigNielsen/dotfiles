@@ -1380,10 +1380,8 @@ add_function() {
   read -r NAME <<< "$func"
   echo $read | xargs -n1 echo
 }
-<<<<<<< HEAD
 
 nitrogen --restore
-=======
 routine() {
 read -d '' help <<- EOF
 ComSci:
@@ -1421,4 +1419,3 @@ sum:
 EOF
 echo "$help"
 }
->>>>>>> 5990ae4bd10cb6fbc32d6d2aa53bbac93bcddca1
