@@ -168,7 +168,7 @@ watchuatrabbitqueues () {
 pushdash() {
   md
   #tag='WMS-3598'
-  tag='WMS-3589' # update orderitem on dashboard parcel management
+  tag='dashboard-reship' # update orderitem on dashboard parcel management
   #wms388=('wms-service' 'dashboard' 'submit-po-to-adaptris' 'adaptris-service')
   wms3598=('wms-service' 'dashboard')
 
@@ -227,14 +227,20 @@ pushsos() {
   IFS=$'\n'
   sos=$(kubectl --context staging --namespace $currentnamespace get pod -o name | grep -v s3f | grep shipping-options-service | sed 's/pods\///')
   checkout_sos=$(kubectl --context staging --namespace checkout get pod -o name | grep -v s3f | grep shipping-options-service | sed 's/pods\///')
+  testing_sos=$(kubectl --context staging --namespace wmstesting get pod -o name | grep -v s3f | grep shipping-options-service | sed 's/pods\///')
   echo $sos | xargs -n1 -P 3 kubectl --context staging --namespace $currentnamespace delete pod
   echo $checkout_sos| xargs -n1 -P 3 kubectl --context staging --namespace checkout delete pod
+  echo $testing_sos| xargs -n1 -P 3 kubectl --context staging --namespace wmstesting delete pod
 # Restore IFS
   IFS=$SAVEIFS
 }
+setimage_wms() {
+  kubectl set image deployment/my-deployment mycontainer=myimage:latest
+  kubectl --context staging --namespace $currentnamespace set image deployment/wms-service
+}
 pushwms() {
   md
-  #tag='WMS-3646'
+  tag='WMS-3329'
   #tag='WMS-3784'
   tag=$dimstag
   cd $HOME/workspace/tal && docker build -t image-registry.ci.env:80/takealot/tal-with-requirements:$tag . && docker push image-registry.ci.env:80/takealot/tal-with-requirements:$tag
@@ -363,7 +369,7 @@ hmasterls() {
 
 dimstag=WMS-3787
 
-alias hwms="helm upgrade --install wms ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=WMS-3787,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
+alias hwms="helm upgrade --install wms ~/workspace/tal/charts/wms-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=master,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
 alias hshipwms="helm upgrade --install wms-shipping-service ~/workspace/tal/charts/wms-shipping-service/ --set image.pullPolicy=IfNotPresent,dev.patch=true,dev.mountPath=/usr/local/tal/tal,dev.hostPath=$HOME/workspace/tal,image.tag=master,resources.requests.cpu=300m,resources.limits.cpu=330,replicas=1 "
 alias hdash="helm upgrade --install dash charts/dashboard --set dashboard.dev.patch=true,dashboardLb.dev.patch=true,dashboard.dev.hostPath=$HOME/workspace/tal,dashboardLb.dev.hostPath=$HOME/workspace/tal/tal/services/dashboard/static,dashboard.image.tag=master"
 sostag='WMS-3324'
@@ -391,6 +397,7 @@ alias watchsockets="watch -n 1 'ss -s'"
 
 alias suat="stern --context staging -n $currentnamespace"
 alias scheckout="stern --context staging -n checkout"
+alias stesting="stern --context staging -n wmstesting"
 alias smaster="stern --context staging -n master"
 alias sprod="stern --context production"
 alias resumekube='~/workspace/tal-kubernetes/bin/resume-minikube.sh'
@@ -407,9 +414,19 @@ hsftp() {
 }
 wmsuatupdatetags() {
 
+  #tag=WMS-3333
+  #wms-service
+  #    Image:      image-registry.ci.env:80/takealot/tal-with-requirements:WMS-3709
+  #    dashboard
+  #        Image:      image-registry.ci.env:80/takealot/tal-with-requirements:WMS-3787]
+  tag=dashboard-reship
   wms388=('wms-service' 'dashboard' 'submit-po-to-adaptris' 'adaptris-service')
-  echo "388 User logging"
-  printf "%s\n" "${wms388[@]}" | xargs -I % sh -c 'echo %; $namespace_command set image deployments/%  %=image-registry.ci.env:80/takealot/tal-with-requirements:WMS-388'
+  #echo "388 User logging"
+  dash=('wms-service' 'dashboard')
+
+  echo "dashbaord fix"
+  #printf "%s\n" "${wms388[@]}" | xargs -I % sh -c 'echo %; $namespace_command set image deployments/%  %=image-registry.ci.env:80/takealot/tal-with-requirements:WMS-388'
+  printf "%s\n" "${dash[@]}" | xargs -I % sh -c 'echo %; $namespace_command set image deployments/%  %=image-registry.ci.env:80/takealot/tal-with-requirements:dashboard-reship'
   echo ''
 
 }
@@ -418,10 +435,11 @@ wmsuatimages() {
 
   wms3769=('s4f-dimension-processor' 'wms-service')
   wms3765=('wms-service' 'dashboard')
-  wms3787=('wms-service' 'dashboard' 's4f-dimension-processor')
+  dashboardreship=('wms-service' 'dashboard')
   wms3589=('wms-service' 'dashboard' 's4f-dimension-processor')
   wms3329=('wms-service' 'tdt-integration-service')
   wms2365=('s3f-wms-service' 's3f-wms-mysql-consumer-cpt' 's3f-wms-mysql-tsin-consumer-cpt' 'wms-service')
+  clickncollect=('wms-service' 'tdt-integration-service' 'delivery-service')
 
   #wms3366=('s4f-dimension-processor' 's4f-sick-client-cpt-inline-01' 's4f-dimension-processor-cub-logfire-consumer' 's4f-wms-logfire-integration-cub-poller-cpt' 's4f-wms-logfire-integration-cub-poller-jhb' 's4f-wms-logfire-integration-sic-poller-cpt' 's4f-wms-logfire-integration-sic-poller-jhb' 's4f-wms-logfire-integration-tsm-poller-cpt' 's4f-wms-logfire-integration-tsm-poller-jhb')
   wms3366=('s4f-dimension-processor' 's4f-sick-client-cpt-inline-01' 's4f-wms-logfire-integration-sic-poller-cpt' 's4f-wms-logfire-integration-sic-poller-jhb')
@@ -461,10 +479,8 @@ wmsuatimages() {
   printf "%s\n" "${wms3589[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
   echo ''
 
-
-  echo "3787 retries for pack using event type, TESTED DEPLOY"
-  echo "https://jira.takealot.com/jira/browse/WMS-3787"
-  printf "%s\n" "${wms3787[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
+  echo "dashboard-reship fix poll queue filters"
+  printf "%s\n" "${dashboardreship[@]}" | xargs -I % sh -c 'echo %; $namespace_command describe deployments % | grep image'
   echo ''
 }
 #mongo_prod_query() {
@@ -1364,5 +1380,45 @@ add_function() {
   read -r NAME <<< "$func"
   echo $read | xargs -n1 echo
 }
+<<<<<<< HEAD
 
 nitrogen --restore
+=======
+routine() {
+read -d '' help <<- EOF
+ComSci:
+Reading 3 hours / week
+Prac HackerRank 3 hrs / week
+Self Projects 5 hours / week
+course 5 hours / week
+
+Meditation:
+3 hours / week
+gardening 4 hours / week
+reading other as many
+
+Music:
+3 hrs / week
+
+Gym: 5 hours / week
+
+total work time weekdays:
+6-3 work (can squeeze in 3 hours of reading during lunch/morning)
+3:30-4:30 gym
+5-5:30 shower
+6:30 - 9:00 progress
+9:00 - 10:00 relax
+excludes WED:
+food prep 6:30-9:00 for Wed, Thurs, Fri
+
+weekends:
+meditation, garden, music
+food prep on Sun for Sun, Mon, Tues
+reading other
+
+sum:
+4*2.5 for progress = 10 hours a week ( need 16 )
+EOF
+echo "$help"
+}
+>>>>>>> 5990ae4bd10cb6fbc32d6d2aa53bbac93bcddca1
