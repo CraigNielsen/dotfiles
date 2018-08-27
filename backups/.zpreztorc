@@ -1196,7 +1196,7 @@ run_gumtree_scrape() {
     do
         #gnome-terminal -e `bash -c 'cd /home/craig/git_repos/data-science/intro_to_python_gis; export PATH="/home/craig/anaconda3/bin:$PATH"; source activate gis;
         #python -m tests.runner3 "$i" "$workers";'`
-        gnome-terminal -e "bash -c 'cd /home/craig/git_repos/data-science/intro_to_python_gis;ls;/home/craig/anaconda3/envs/gis/bin/python -m tests.runner3 $i $workers;sleep 500;'"
+        gnome-terminal -e "bash -c 'cd /home/craig/git_repos/data-science/intro_to_python_gis;ls;/home/craig/anaconda3/envs/gis/bin/python -m tests.runner3 $i $workers Gumtree sale houses-flats-for-sale;sleep 500;'"
     done
 }
 
@@ -1207,7 +1207,8 @@ run_gumtree_scrape_rental() {
     do
         #gnome-terminal -e `bash -c 'cd /home/craig/git_repos/data-science/intro_to_python_gis; export PATH="/home/craig/anaconda3/bin:$PATH"; source activate gis;
         #python -m tests.runner3 "$i" "$workers";'`
-        gnome-terminal -e "bash -c 'cd /home/craig/git_repos/data-science/intro_to_python_gis;ls;/home/craig/anaconda3/envs/gis/bin/python -m tests.runner_rental $i $workers;sleep 60;'"
+        #
+        gnome-terminal -e "bash -c 'cd /home/craig/git_repos/data-science/intro_to_python_gis;ls;/home/craig/anaconda3/envs/gis/bin/python -m tests.runner3 $i $workers Gumtree rental houses-flats-for-rent; sleep 60;'"
     done
 }
 
