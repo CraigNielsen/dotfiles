@@ -130,7 +130,7 @@ bindsym $mod+c exec google-chrome --force-device-scale-factor=1
 bindsym $mod+Shift+t exec atom
 #bindsym $mod+Shift+p exec ./pycharm-145.597.11/bin/pycharm.sh
 bindsym $mod+Shift+s exec --no-startup-id "i3lock -i ~/Pictures/ie.png -c 000000"
-bindsym $mod+Shift+g exec --no-startup-id "i3lock -c 333333; systemctl suspend"
+bindsym $mod+Shift+g exec --no-startup-id /home/craig/bin/sleeper
 #bindsym $mod+Shift+x exec --no-startup-id "i3lock -c 333333; sleep 1; xset dpms force off"
 bindsym $mod+F9 exec amixer -q set Master toggle
 bindsym $mod+F10 exec amixer -q set Master 7%- unmute
@@ -184,6 +184,7 @@ bindsym $mod+r mode "resize"
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
+
 bar {
         status_command i3status
 }
