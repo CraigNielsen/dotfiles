@@ -14,6 +14,9 @@ then
   python loadConfig.py macSave.txt
 fi
 
+cd $HOME/.idea
+echo 'pulling idea'
+git pull
 cd $HOME/.config/nvim/UltiSnips
 echo 'pulling UltiSnips'
 git pull
